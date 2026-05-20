@@ -1,0 +1,418 @@
+/*COLORES PRINCIPALES*/
+:root {
+    --azul-oscuro:  #0a1628;
+    --azul-medio:   #0d3b66;
+    --azul-acento:  #1a6fc4;
+    --dorado:       #eeba58;
+    --texto-muted:  #8fa3bc;
+    --fondo-pagina: #f0f4f9;
+}
+
+/* ════════════════════════════════════
+   BASE
+════════════════════════════════════ */
+body {
+    display: flex;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: var(--fondo-pagina);
+    flex-direction: column;
+    min-height: 100vh;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: var(--fondo-pagina);
+    margin: 0;
+    padding: 0;
+}
+
+/* ════════════════════════════════════
+   SECCIÓN INICIO
+════════════════════════════════════ */
+.Inicio {
+    background-image:
+    /*ESTO PERMITE HACER UN DEGRADADO CON COLES AZULES*/
+            linear-gradient(
+                    to bottom,
+                    rgba(10, 22, 40, 0.80) 0%,
+                    rgba(10, 22, 40, 0.65) 55%,
+                    rgba(10, 22, 40, 0.88) 100%
+            ),
+            url('https://images.unsplash.com/photo-1629904853893-c2c8981a1dc5?q=80&w=1170&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ════════════════════════════════════
+   NAVBAR
+════════════════════════════════════ */
+.navbar-custom {
+    background-color: transparent !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 16px 0;
+}
+
+/* Logo / brand — el <p> con la imagen */
+.navbar-custom p {
+    color: #ffffff;
+    font-size: 18px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Links del menú */
+.navbar-custom .nav-link {
+    color: rgba(255, 255, 255, 0.80);
+    font-size: 14px;
+    padding: 6px 14px;
+    transition: color 0.2s ease;
+}
+
+/*login*/
+.navbar-custom .nav-link:hover {
+    color: var(--dorado);
+}
+
+/* Botón Login */
+.navbar-custom .nav-link:last-child {
+    background-color: var(--dorado);
+    color: var(--azul-oscuro) !important;
+    border-radius: 6px;
+    font-weight: bold;
+    padding: 7px 20px;
+    margin-left: 8px;
+}
+
+.navbar-custom .nav-link:last-child:hover {
+    background-color: #ffffff;
+}
+
+/* ════════════════════════════════════
+   HERO
+════════════════════════════════════ */
+.hero-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 50px 20px 70px;
+}
+
+.hero-eyebrow {
+    color: var(--dorado);
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+}
+
+.hero-title {
+    color: #ffffff;
+    font-size: 46px;
+    font-weight: bold;
+    line-height: 1.2;
+    margin-bottom: 0;
+}
+
+/* ════════════════════════════════════
+   BÚSQUEDA RÁPIDA
+════════════════════════════════════ */
+.busqueda-rapida {
+    margin-top: -32px;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 10;
+}
+
+.busqueda-rapida .card {
+    border: none;
+    border-top: 4px solid var(--azul-medio);
+    border-radius: 10px;
+    box-shadow: 0 6px 24px rgba(13, 59, 102, 0.18);
+}
+
+.busqueda-rapida h5 {
+    color: var(--azul-oscuro);
+}
+
+/* ════════════════════════════════════
+   LOGIN RÁPIDO
+════════════════════════════════════ */
+.login-rapida {
+    margin-top: -32px;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 10;
+}
+
+.login-rapida .card {
+    border: none;
+    border-top: 4px solid var(--azul-medio);
+    border-radius: 10px;
+    box-shadow: 0 6px 24px rgba(13, 59, 102, 0.18);
+}
+
+/* ════════════════════════════════════
+   FILTROS (BUSCAR PUESTO)
+════════════════════════════════════ */
+.contenedor-filtros {
+    background-color: #f4f4f4;
+    padding: 25px;
+    border-radius: 6px;
+    width: 350px;
+    font-family: Arial, sans-serif;
+}
+
+.grupo-categoria {
+    margin-bottom: 12px;
+}
+
+.categoria-padre,
+.item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.sub-opciones {
+    margin-left: 28px;
+    display: flex;
+    flex-direction: column;
+}
+
+input[type="checkbox"] {
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+label {
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.seccion-scroll {
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 10px;
+    margin-bottom: 15px;
+}
+
+.seccion-botones {
+    margin-top: 20px;
+}
+
+.btn-azul {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 6px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-blanco {
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 6px 15px;
+    border-radius: 4px;
+    margin-left: 5px;
+    cursor: pointer;
+}
+
+/* ════════════════════════════════════
+   FOOTER
+════════════════════════════════════ */
+footer {
+    background-color: var(--azul-oscuro);
+    color: var(--texto-muted);
+    padding: 26px 0;
+    margin-top: auto;
+    font-size: 14px;
+    border-top: 3px solid var(--dorado);
+}
+
+footer strong {
+    color: #ffffff;
+}
+
+/* ════════════════════════════════════
+   INICIO ADMIN
+════════════════════════════════════ */
+.Inicio_Admin {
+    background-image:
+            linear-gradient(
+                    to bottom,
+                    rgba(10, 22, 40, 0.85) 0%,
+                    rgba(10, 22, 40, 0.75) 100%
+            ),
+            url('https://images.unsplash.com/photo-1629904853893-c2c8981a1dc5?q=80&w=1170&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center;
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* ════════════════════════════════════
+  ultimos puestos
+════════════════════════════════════ */
+
+/* CONTENEDOR */
+.contenedor-puestos {
+    padding: 2rem;
+    background-color: #f4f6f9;
+}
+
+.contenedor-puestos h2 {
+    margin-bottom: 1.5rem;
+    color: #1b2a41;
+}
+
+/* GRID */
+.grid-puestos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+/* CARD */
+.card-puesto {
+    position: relative;
+    background-color: #ffffff;
+    padding: 1.2rem;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    overflow: hidden;
+}
+
+/* TEXTO */
+.card-puesto h3 {
+    font-size: 16px;
+    margin-bottom: 5px;
+    color: #1b2a41;
+}
+
+.titulo {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+.salario {
+    font-size: 15px;
+    font-weight: bold;
+    color: #2d8a4e;
+}
+
+/* BOTÓN (opcional ocultarlo si ya no se usa) */
+.btn-detalle {
+    display: none;
+}
+
+/* DETALLE OVERLAY */
+.detalle {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    background-color: rgba(13, 27, 42, 0.95);
+    color: white;
+
+    padding: 1rem;
+    border-radius: 8px;
+
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+
+/* MOSTRAR AL PASAR EL MOUSE */
+.card-puesto:hover .detalle {
+    opacity: 1;
+}
+
+/* ════════════════════════════════════
+   HERO
+════════════════════════════════════ */
+
+/* HERO */
+.Inicio_Admin .hero-eyebrow {
+    color: var(--dorado);
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+
+
+/* ════════════════════════════════════
+   empresas/oferentes pendientes
+════════════════════════════════════ */
+/* TITULO */
+.titulo-seccion {
+    font-size: 22px;
+    font-weight: bold;
+    color: #1b2a41;
+    margin-bottom: 1rem;
+}
+
+/* TABLA */
+.tabla-simple {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #ffffff;
+}
+
+/* HEADER */
+.tabla-simple thead {
+    background-color: #eeeeee;
+}
+
+.tabla-simple th {
+    text-align: left;
+    padding: 10px;
+    font-size: 13px;
+    color: #333;
+}
+
+/* FILAS */
+.tabla-simple td {
+    padding: 10px;
+    font-size: 14px;
+    border-top: 1px solid #ddd;
+}
+
+/* BOTÓN */
+.btn-aprobar-simple {
+    background-color: #2d8a4e;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.btn-aprobar-simple:hover {
+    background-color: #256f3e;
+}
+
+/* NAVBAR */
+.navbar-custom {
+    background-color: #0d1b2a;
+}
+
+.navbar-custom .nav-link {
+    color: white;
+    margin-left: 15px;
+}
+
+.navbar-custom .nav-link:hover {
+    color: #d4a017;
+}

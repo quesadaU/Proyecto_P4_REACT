@@ -1,0 +1,169 @@
+/*
+ * ╔══════════════════════════════════════════════════════════════╗
+ * ║  registro-empresa.css                                        ║
+ * ║  Estilos específicos para la vista viewRegistroEmpresa.html  ║
+ * ║  Este archivo COMPLEMENTA style.css (no lo reemplaza).       ║
+ * ║  Se carga DESPUÉS de style.css en el <head>.                 ║
+ * ╚══════════════════════════════════════════════════════════════╝
+ *
+ *  Variables de color definidas en style.css:
+ *   --azul-oscuro:  #0a1628
+ *   --azul-medio:   #0d3b66
+ *   --azul-acento:  #1a6fc4
+ *   --dorado:       #eeba58
+ *   --texto-muted:  #8fa3bc
+ *   --fondo-pagina: #f0f4f9
+ */
+
+
+/* ════════════════════════════════════════════════════════════
+   SECCIÓN PRINCIPAL DEL FORMULARIO
+   Agrega espacio vertical alrededor de la tarjeta del form.
+════════════════════════════════════════════════════════════ */
+.seccion-registro {
+    padding-top: 2.5rem;
+    padding-bottom: 3rem;
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   TARJETA DEL FORMULARIO
+   Sombra suave y borde superior dorado para diferenciarse
+   de tarjetas genéricas de Bootstrap.
+════════════════════════════════════════════════════════════ */
+.card-registro {
+    border-top: 4px solid var(--dorado);   /* acento dorado arriba */
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(10, 22, 40, 0.10);
+    background-color: #ffffff;
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   TÍTULO DEL FORMULARIO
+   Mismo azul oscuro que se usa en el resto del proyecto.
+════════════════════════════════════════════════════════════ */
+.titulo-form {
+    color: var(--azul-oscuro);
+    font-size: 18px;
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   BLOQUES INTERNOS DEL FORMULARIO
+   Separan visualmente "Credenciales" de "Datos de empresa".
+   Un borde izquierdo azul indica que son secciones distintas.
+════════════════════════════════════════════════════════════ */
+.bloque-form {
+    background-color: #f8f9fb;             /* fondo muy suave */
+    border-left: 3px solid var(--azul-acento);
+    border-radius: 6px;
+    padding: 1rem 1.2rem;
+    margin-bottom: 1.4rem;
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   SUBTÍTULOS DE CADA BLOQUE
+   Letras mayúsculas pequeñas, en azul acento.
+════════════════════════════════════════════════════════════ */
+.subtitulo-bloque {
+    color: var(--azul-acento);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 1rem;
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   INPUTS Y TEXTAREA
+   Sobrescribe el foco de Bootstrap para usar el azul del proyecto.
+════════════════════════════════════════════════════════════ */
+.card-registro .form-control:focus {
+    border-color: var(--azul-acento);
+    box-shadow: 0 0 0 0.2rem rgba(26, 111, 196, 0.20);
+}
+
+/* Textarea: altura mínima cómoda */
+.card-registro textarea.form-control {
+    min-height: 90px;
+    resize: vertical;               /* el usuario puede agrandarla */
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   BOTÓN PRINCIPAL "Registrar empresa"
+   Dorado con texto oscuro, igual al botón Login del navbar.
+   Al pasar el mouse se vuelve blanco con borde dorado.
+════════════════════════════════════════════════════════════ */
+.btn-registro {
+    background-color: var(--dorado);
+    color: var(--azul-oscuro);
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 0;
+    font-size: 15px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.btn-registro:hover {
+    background-color: #ffffff;
+    color: var(--azul-oscuro);
+    border: 2px solid var(--dorado);
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   ALERTAS (éxito / error)
+   Ajustes mínimos para que queden bien dentro de la tarjeta.
+════════════════════════════════════════════════════════════ */
+.card-registro .alert {
+    font-size: 14px;
+    border-radius: 6px;
+}
+
+.card-registro .alert-success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+.card-registro .alert-danger {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   LINKS AL PIE DE LA TARJETA
+   Mismo color azul acento del proyecto.
+════════════════════════════════════════════════════════════ */
+.card-registro a {
+    color: var(--azul-acento);
+    text-decoration: none;
+}
+
+.card-registro a:hover {
+    color: var(--dorado);
+    text-decoration: underline;
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   RESPONSIVIDAD MÓVIL
+   En pantallas pequeñas se quita el padding lateral de la sección.
+════════════════════════════════════════════════════════════ */
+@media (max-width: 576px) {
+    .seccion-registro {
+        padding-top: 1.5rem;
+        padding-bottom: 2rem;
+    }
+
+    .card-registro {
+        padding: 1rem !important;  /* reduce el p-4 de Bootstrap */
+    }
+}

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{presentation/fragmentPublic :: head}"></head>
+<body>
+
+<!-- ── Navbar ──────────────────────────────────────────── -->
+<section class="Inicio">
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container">
+            <p class="mb-0 d-flex align-items-center">
+                <img src="https://cdn-icons-png.flaticon.com/512/86/86155.png"
+                     alt="icono"
+                     style="width:50px;height:50px;filter: brightness(0) invert(1);">
+                <strong class="ms-2 text-white"> Bolsa de Empleo</strong>
+            </p>
+            <div class="navbar-nav ms-auto align-items-center">
+                <a class="nav-link" th:href="@{/DashboardAdministrador}">Dashboard</a>
+                <a class="nav-link" th:href="@{/EmpresasPendientes}">Empresas pendientes</a>
+                <a class="nav-link" th:href="@{/OferentesPendientes}">Oferentes pendientes</a>
+                <a class="nav-link" th:href="@{/AdminCaracteristicas}">Características</a>
+                <a class="nav-link active" th:href="@{/admin/reportes}">Reportes</a>
+                <a class="nav-link" th:href="@{/logout}">Salir</a>
+            </div>
+        </div>
+    </nav>
+</section>
+
+<!-- ── Contenido ───────────────────────────────────────── -->
+<div class="container mt-5" style="max-width: 640px;">
+
+    <h2 class="fw-bold mb-1">Reportes</h2>
+    <p class="text-muted mb-4">Generá un PDF con los puestos solicitados en el período elegido.</p>
+
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-body p-4">
+
+            <h5 class="card-title fw-semibold mb-3">Reporte de puestos por mes</h5>
+
+            <form th:action="@{/admin/reportes/pdf}" method="get">
+                <div class="row g-3 mb-4">
+
+                    <div class="col-sm-6">
+                        <label for="mes" class="form-label fw-medium">Mes</label>
+                        <select id="mes" name="mes" class="form-select" required>
+                            <option value="1">Enero</option>
+                            <option value="2">Febrero</option>
+                            <option value="3">Marzo</option>
+                            <option value="4">Abril</option>
+                            <option value="5">Mayo</option>
+                            <option value="6">Junio</option>
+                            <option value="7">Julio</option>
+                            <option value="8">Agosto</option>
+                            <option value="9">Septiembre</option>
+                            <option value="10">Octubre</option>
+                            <option value="11">Noviembre</option>
+                            <option value="12">Diciembre</option>
+                        </select>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label for="anio" class="form-label fw-medium">Año</label>
+                        <select id="anio" name="anio" class="form-select" required>
+                            <option th:each="a : ${anios}"
+                                    th:value="${a}"
+                                    th:text="${a}"
+                                    th:selected="${a == anioActual}">
+                            </option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">
+                    Descargar PDF
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="alert alert-info mt-4 border-0" role="alert" style="background-color:#eff6ff;">
+        <span style="font-size:.9rem; color:#1e3a8a;">
+            El PDF incluye el listado completo de puestos creados en el período
+            seleccionado, junto con un resumen de totales por tipo y estado.
+        </span>
+    </div>
+
+</div>
+
+<footer th:replace="~{presentation/fragmentPublic :: footer}"></footer>
+
+<script>
+    (function () {
+        var mesActual = new Date().getMonth() + 1;
+        document.getElementById('mes').value = String(mesActual);
+    })();
+</script>
+
+</body>
+</html>

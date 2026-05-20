@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{presentation/fragmentPublic :: head}"></head>
+<body>
+
+<section class="Inicio">
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container">
+            <p class="mb-0 d-flex align-items-center">
+                <img src="https://cdn-icons-png.flaticon.com/512/86/86155.png" alt="icono"
+                     style="width:50px;height:50px;filter: brightness(0) invert(1);">
+                <strong class="ms-2 text-white"> Bolsa de Empleo</strong>
+            </p>
+            <div class="navbar-nav ms-auto align-items-center">
+                <a class="nav-link"        th:href="@{/DashboardEmpresa}">Dashboard</a>
+                <a class="nav-link active" th:href="@{/empresa/puestos}">Mis puestos</a>
+                <a class="nav-link"        th:href="@{/empresa/puestos/nuevo}">Publicar puesto</a>
+                <a class="nav-link"        th:href="@{/empresa/editar}">Mi perfil</a>
+                <a class="nav-link"        th:href="@{/logout}">Salir</a>
+            </div>
+        </div>
+    </nav>
+</section>
+
+<div class="container mt-5">
+
+    <div th:if="${param.exito}" class="alert alert-success">✅ Puesto creado correctamente.</div>
+
+    <h2 class="fw-bold">Mis puestos</h2>
+
+    <a th:href="@{/empresa/puestos/nuevo}" class="btn btn-primary mb-3">Publicar puesto</a>
+
+    <!-- Sin puestos aún -->
+    <p th:if="${puestos == null or #lists.isEmpty(puestos)}" class="text-muted">
+        Aún no tenés puestos publicados.
+    </p>
+
+    <!-- Tabla de puestos -->
+    <table class="table table-bordered" th:if="${puestos != null and not #lists.isEmpty(puestos)}">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Descripción</th>
+                <th>Salario</th>
+                <th>Tipo</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="p : ${puestos}">
+                <td th:text="${p.id}"></td>
+                <td th:text="${p.descripcion}"></td>
+                <td th:text="'₡ ' + ${p.salario}"></td>
+                <td th:text="${p.tipo}"></td>
+                <td>
+                    <span th:classappend="${p.estado == 'ACTIVO'} ? 'badge bg-success' : 'badge bg-secondary'"
+                          th:text="${p.estado}"></span>
+                </td>
+                <td class="d-flex gap-2">
+                    <!-- Desactivar puesto -->
+                    <form method="POST" th:action="@{/empresa/puestos/desactivar}"
+                          th:if="${p.estado == 'ACTIVO'}">
+                        <input type="hidden" name="puestoId" th:value="${p.id}">
+                        <button type="submit" class="btn btn-sm btn-warning">Desactivar</button>
+                    </form>
+
+                    <!-- Buscar candidatos -->
+                    <a th:href="@{/empresa/candidatos(puestoId=${p.id})}"
+                       class="btn btn-sm btn-primary">Buscar candidatos</a>
+
+                    <!-- Ver/editar habilidades del puesto -->
+                    <a th:href="@{'/empresa/puestos/' + ${p.id}}"
+                       class="btn btn-sm btn-outline-secondary">Habilidades</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<footer th:replace="~{presentation/fragmentPublic :: footer}"></footer>
+</body>
+</html>

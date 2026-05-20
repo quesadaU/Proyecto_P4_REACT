@@ -1,0 +1,180 @@
+/*
+ * ╔══════════════════════════════════════════════════════════════╗
+ * ║  registro_oferente.css                                       ║
+ * ║  Estilos específicos para la vista viewRegistroOferente.html ║
+ * ║  Este archivo COMPLEMENTA style.css (no lo reemplaza).       ║
+ * ║  Se carga DESPUÉS de style.css en el <head>.                 ║
+ * ╚══════════════════════════════════════════════════════════════╝
+ *
+ *  Variables de color definidas en style.css:
+ *   --azul-oscuro:  #0a1628
+ *   --azul-medio:   #0d3b66
+ *   --azul-acento:  #1a6fc4
+ *   --dorado:       #eeba58
+ *   --texto-muted:  #8fa3bc
+ *   --fondo-pagina: #f0f4f9
+ */
+
+
+/* ════════════════════════════════════════════════════════════
+   HERO ESPECÍFICO OFERENTE
+   Imagen de fondo diferente a la de empresa para distinguir
+   visualmente los dos flujos de registro.
+════════════════════════════════════════════════════════════ */
+.inicio-oferente {
+    background-image:
+            linear-gradient(
+                    to bottom,
+                    rgba(10, 22, 40, 0.80) 0%,
+                    rgba(10, 22, 40, 0.65) 55%,
+                    rgba(10, 22, 40, 0.88) 100%
+            ),
+            url('https://images.unsplash.com/photo-1521791136064-7986c2920216?q=80&w=1170&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center top;
+    background-repeat: no-repeat;
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   SECCIÓN PRINCIPAL DEL FORMULARIO
+════════════════════════════════════════════════════════════ */
+.seccion-registro {
+    padding-top: 2.5rem;
+    padding-bottom: 3rem;
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   TARJETA DEL FORMULARIO
+   Borde superior en azul acento para diferenciarla de la
+   tarjeta de empresa (que usa el dorado).
+════════════════════════════════════════════════════════════ */
+.card-registro {
+    border-top: 4px solid var(--azul-acento);
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(10, 22, 40, 0.10);
+    background-color: #ffffff;
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   TÍTULO DEL FORMULARIO
+════════════════════════════════════════════════════════════ */
+.titulo-form {
+    color: var(--azul-oscuro);
+    font-size: 18px;
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   BLOQUES INTERNOS DEL FORMULARIO
+   Borde izquierdo dorado para diferenciar de registro empresa
+   (que usa azul acento).
+════════════════════════════════════════════════════════════ */
+.bloque-form {
+    background-color: #f8f9fb;
+    border-left: 3px solid var(--dorado);
+    border-radius: 6px;
+    padding: 1rem 1.2rem;
+    margin-bottom: 1.4rem;
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   SUBTÍTULOS DE CADA BLOQUE
+════════════════════════════════════════════════════════════ */
+.subtitulo-bloque {
+    color: var(--azul-medio);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 1rem;
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   INPUTS
+════════════════════════════════════════════════════════════ */
+.card-registro .form-control:focus {
+    border-color: var(--dorado);
+    box-shadow: 0 0 0 0.2rem rgba(238, 186, 88, 0.25);
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   BOTÓN PRINCIPAL "Registrarme como oferente"
+   Azul acento con texto blanco — diferente al botón de empresa
+   que usa el dorado.
+════════════════════════════════════════════════════════════ */
+.btn-registro {
+    background-color: var(--azul-acento);
+    color: #ffffff;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 0;
+    font-size: 15px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.btn-registro:hover {
+    background-color: var(--azul-medio);
+    color: #ffffff;
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   ALERTAS
+════════════════════════════════════════════════════════════ */
+.card-registro .alert {
+    font-size: 14px;
+    border-radius: 6px;
+}
+
+.card-registro .alert-success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+.card-registro .alert-danger {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   LINKS AL PIE DE LA TARJETA
+════════════════════════════════════════════════════════════ */
+.card-registro a {
+    color: var(--azul-acento);
+    text-decoration: none;
+}
+
+.card-registro a:hover {
+    color: var(--dorado);
+    text-decoration: underline;
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   RESPONSIVIDAD MÓVIL
+════════════════════════════════════════════════════════════ */
+@media (max-width: 576px) {
+    .seccion-registro {
+        padding-top: 1.5rem;
+        padding-bottom: 2rem;
+    }
+
+    .card-registro {
+        padding: 1rem !important;
+    }
+
+    /* En móvil, los campos de fila doble ocupan todo el ancho */
+    .card-registro .row > [class*="col-md"] {
+        margin-bottom: 0;
+    }
+}

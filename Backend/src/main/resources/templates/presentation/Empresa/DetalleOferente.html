@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{presentation/fragmentPublic :: head}"></head>
+<body>
+
+<section class="Inicio">
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container">
+            <p class="mb-0 d-flex align-items-center">
+                <img src="https://cdn-icons-png.flaticon.com/512/86/86155.png" alt="icono"
+                     style="width:50px;height:50px;filter: brightness(0) invert(1);">
+                <strong class="ms-2 text-white"> Bolsa de Empleo</strong>
+            </p>
+            <div class="navbar-nav ms-auto align-items-center">
+                <a class="nav-link"        th:href="@{/DashboardEmpresa}">Dashboard</a>
+                <a class="nav-link active" th:href="@{/empresa/puestos}">Mis puestos</a>
+                <a class="nav-link"        th:href="@{/empresa/puestos/nuevo}">Publicar puesto</a>
+                <a class="nav-link"        th:href="@{/logout}">Salir</a>
+            </div>
+        </div>
+    </nav>
+</section>
+
+<div class="container mt-5">
+    <h2 class="fw-bold">Detalle del oferente</h2>
+
+    <!-- Datos personales del oferente -->
+    <div class="card p-4 mb-4" style="max-width: 600px;">
+        <h5 class="fw-bold mb-3"
+            th:text="${oferente.nombre + ' ' + oferente.apellido}"></h5>
+        <table class="table table-sm table-borderless mb-0">
+            <tbody>
+            <tr>
+                <td class="fw-bold text-muted" style="width:160px;">Correo</td>
+                <td th:text="${oferente.correo}"></td>
+            </tr>
+            <tr>
+                <td class="fw-bold text-muted">Teléfono</td>
+                <td th:text="${oferente.telefono}"></td>
+            </tr>
+            <tr>
+                <td class="fw-bold text-muted">Residencia</td>
+                <td th:text="${oferente.residencia}"></td>
+            </tr>
+            <tr>
+                <td class="fw-bold text-muted">Nacionalidad</td>
+                <td th:text="${oferente.nacionalidad}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Habilidades del oferente -->
+    <h5 class="fw-bold">Habilidades</h5>
+    <p th:if="${habilidades == null or #lists.isEmpty(habilidades)}" class="text-muted">
+        Este oferente no ha registrado habilidades aún.
+    </p>
+
+    <table class="table table-sm table-bordered align-middle"
+           style="max-width: 520px;"
+           th:if="${habilidades != null and not #lists.isEmpty(habilidades)}">
+        <thead class="table-dark">
+        <tr>
+            <th>Característica</th>
+            <th class="text-center">Nivel</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="h : ${habilidades}">
+            <td th:text="${h.caracteristicas.nombre}"></td>
+            <td class="text-center">
+                    <span th:each="i : ${#numbers.sequence(1, h.nivel)}"
+                          style="color: var(--dorado); font-size: 16px;">&#9733;</span>
+                <span th:each="i : ${#numbers.sequence(h.nivel + 1, 5)}"
+                      style="color: #ccc; font-size: 16px;">&#9733;</span>
+                <small class="text-muted ms-1">(<span th:text="${h.nivel}"></span>/5)</small>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- Botón para ver el CV del oferente -->
+    <div class="mt-3">
+        <a th:if="${tieneCv}"
+           th:href="@{/empresa/candidatos/cv(oferenteId=${oferente.id})}"
+           target="_blank"
+           class="btn btn-outline-primary">
+            &#128196; Ver Currículum (PDF)
+        </a>
+        <p th:unless="${tieneCv}" class="text-muted fst-italic">
+            Este oferente no ha subido su currículum aún.
+        </p>
+    </div>
+
+    <a th:href="${urlVolver}" class="btn btn-secondary mt-4">Volver</a>
+</div>
+
+<footer th:replace="~{presentation/fragmentPublic :: footer}"></footer>
+</body>
+</html>

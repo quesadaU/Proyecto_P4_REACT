@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{presentation/fragmentPublic :: head}"></head>
+<body>
+
+<section class="Inicio">
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container">
+            <p class="mb-0 d-flex align-items-center">
+                <img src="https://cdn-icons-png.flaticon.com/512/86/86155.png" alt="icono"
+                     style="width:50px;height:50px;filter: brightness(0) invert(1);">
+                <strong class="ms-2 text-white"> Bolsa de Empleo</strong>
+            </p>
+            <div class="navbar-nav ms-auto align-items-center">
+                <a class="nav-link"        th:href="@{/DashboardOferente}">Dashboard</a>
+                <a class="nav-link active" th:href="@{/oferente/habilidades}">Mis Habilidades</a>
+                <a class="nav-link"        th:href="@{/oferente/curriculum}">Mi CV</a>
+                <span class="nav-link text-warning fw-bold" th:text="${usuario.username}"></span>
+                <a class="nav-link"        th:href="@{/logout}">Salir</a>
+            </div>
+        </div>
+    </nav>
+</section>
+
+<div class="container mt-5">
+    <h2 class="fw-bold">Mis habilidades</h2>
+
+    <div th:if="${error}"   class="alert alert-danger"  th:text="${error}"></div>
+    <div th:if="${mensaje}" class="alert alert-success" th:text="${mensaje}"></div>
+
+    <div class="row g-4">
+
+        <!-- ── Columna izquierda: habilidades actuales ── -->
+        <div class="col-md-7">
+            <h5 class="mb-3">Características registradas</h5>
+
+            <p th:if="${habilidades == null or #lists.isEmpty(habilidades)}" class="text-muted">
+                Aún no has agregado ninguna habilidad.
+            </p>
+
+            <table class="table table-sm table-bordered align-middle"
+                   th:if="${habilidades != null and not #lists.isEmpty(habilidades)}">
+                <thead class="table-dark">
+                <tr>
+                    <th>Característica</th>
+                    <th class="text-center">Nivel (1–5)</th>
+                    <th class="text-center">Acción</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="h : ${habilidades}">
+                    <td th:text="${h.caracteristicas.nombre}"></td>
+                    <td class="text-center">
+                        <!-- Estrellas visuales según nivel -->
+                        <span th:each="i : ${#numbers.sequence(1, h.nivel)}"
+                              style="color: var(--dorado); font-size: 16px;">&#9733;</span>
+                        <span th:each="i : ${#numbers.sequence(h.nivel + 1, 5)}"
+                              style="color: #ccc; font-size: 16px;">&#9733;</span>
+                        <small class="text-muted ms-1">(<span th:text="${h.nivel}"></span>/5)</small>
+                    </td>
+                    <td class="text-center">
+                        <form method="POST" th:action="@{/oferente/habilidades/eliminar}">
+                            <input type="hidden" name="habilidadId" th:value="${h.id}">
+                            <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ── Columna derecha: formulario agregar habilidad ── -->
+        <div class="col-md-5">
+            <div class="card p-4">
+                <h5 class="fw-bold">Agregar habilidad</h5>
+                <form method="POST" th:action="@{/oferente/habilidades}">
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Característica</label>
+                        <select name="caracteristicaId" class="form-select" required>
+                            <option value="">-- Seleccioná --</option>
+                            <option th:each="c : ${caracteristicas}"
+                                    th:value="${c.id}"
+                                    th:text="${c.nombre}"></option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Nivel (1–5)</label>
+                        <input type="number" name="nivel" class="form-control"
+                               min="1" max="5" placeholder="ej: 3" required>
+                        <div class="form-text">
+                            1 = básico &nbsp;·&nbsp; 3 = intermedio &nbsp;·&nbsp; 5 = experto
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Agregar</button>
+                </form>
+            </div>
+        </div>
+
+    </div><!-- /row -->
+
+    <a th:href="@{/DashboardOferente}" class="btn btn-secondary mt-4">Volver al Dashboard</a>
+</div>
+
+<footer th:replace="~{presentation/fragmentPublic :: footer}"></footer>
+</body>
+</html>

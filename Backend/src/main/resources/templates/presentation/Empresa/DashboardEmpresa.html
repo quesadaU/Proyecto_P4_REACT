@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{presentation/fragmentPublic :: head}"></head>
+<body>
+
+<section class="Inicio">
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container">
+            <p class="mb-0 d-flex align-items-center">
+                <img src="https://cdn-icons-png.flaticon.com/512/86/86155.png"
+                     alt="icono"
+                     style="width:50px;height:50px;filter: brightness(0) invert(1);">
+                <strong class="ms-2 text-white"> Bolsa de Empleo</strong>
+            </p>
+            <div class="navbar-nav ms-auto align-items-center">
+                <a class="nav-link active"  th:href="@{/DashboardEmpresa}">Dashboard</a>
+                <a class="nav-link"         th:href="@{/empresa/puestos}">Mis puestos</a>
+                <a class="nav-link"         th:href="@{/empresa/puestos/nuevo}">Publicar puesto</a>
+                <a class="nav-link"         th:href="@{/empresa/editar}">Mi perfil</a>
+                <a class="nav-link"         th:href="@{/logout}">Salir</a>
+            </div>
+        </div>
+    </nav>
+</section>
+
+<div class="container mt-5">
+
+    <!-- Mensaje de éxito al volver de editar -->
+    <div th:if="${param.exito}" class="alert alert-success">
+         Datos actualizados correctamente.
+    </div>
+
+    <h2 class="fw-bold">Empresa - Dashboard</h2>
+    <p class="text-muted">Desde aquí podés administrar tus puestos y buscar candidatos.</p>
+
+    <!-- Datos de la empresa -->
+    <div class="card p-4 mb-4" th:if="${empresa != null}">
+        <h5 class="fw-bold" th:text="${empresa.nombre}"></h5>
+        <p class="mb-1"><strong>Localización:</strong> <span th:text="${empresa.localizacion}"></span></p>
+        <p class="mb-1"><strong>Correo:</strong>       <span th:text="${empresa.correo}"></span></p>
+        <p class="mb-1"><strong>Teléfono:</strong>     <span th:text="${empresa.telefono}"></span></p>
+        <p class="mb-0"><strong>Descripción:</strong>  <span th:text="${empresa.descripcion}"></span></p>
+    </div>
+
+    <!-- Botones de navegación -->
+    <div class="d-flex gap-3 flex-wrap">
+        <a th:href="@{/empresa/puestos}"       class="btn btn-primary">Ver mis puestos</a>
+        <a th:href="@{/empresa/puestos/nuevo}" class="btn btn-primary">Publicar nuevo puesto</a>
+        <a th:href="@{/empresa/editar}"        class="btn btn-secondary">Editar mis datos</a>
+    </div>
+</div>
+
+<footer th:replace="~{presentation/fragmentPublic :: footer}"></footer>
+</body>
+</html>

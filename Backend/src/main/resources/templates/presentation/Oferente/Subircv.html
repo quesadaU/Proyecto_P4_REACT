@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{presentation/fragmentPublic :: head}"></head>
+<body>
+
+<section class="Inicio">
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container">
+            <p class="mb-0 d-flex align-items-center">
+                <img src="https://cdn-icons-png.flaticon.com/512/86/86155.png" alt="icono"
+                     style="width:50px;height:50px;filter: brightness(0) invert(1);">
+                <strong class="ms-2 text-white"> Bolsa de Empleo</strong>
+            </p>
+            <div class="navbar-nav ms-auto align-items-center">
+                <a class="nav-link"        th:href="@{/DashboardOferente}">Dashboard</a>
+                <a class="nav-link"        th:href="@{/oferente/habilidades}">Mis Habilidades</a>
+                <a class="nav-link active" th:href="@{/oferente/curriculum}">Mi CV</a>
+                <span class="nav-link text-warning fw-bold" th:text="${usuario.username}"></span>
+                <a class="nav-link"        th:href="@{/logout}">Salir</a>
+            </div>
+        </div>
+    </nav>
+</section>
+
+<div class="container mt-5" style="max-width: 600px;">
+    <h2 class="fw-bold">Mi Currículum</h2>
+
+    <div th:if="${error}"   class="alert alert-danger"  th:text="${error}"></div>
+    <div th:if="${mensaje}" class="alert alert-success" th:text="${mensaje}"></div>
+
+    <!-- Estado actual del CV -->
+    <div class="card p-4 mb-4">
+        <h5 class="fw-bold">Estado del CV</h5>
+        <div th:if="${tieneCv}">
+            <p class="text-success mb-2">
+                <strong>&#10003; CV cargado.</strong> Las empresas pueden consultarlo al revisar tu perfil.
+            </p>
+            <a th:href="@{/oferente/curriculum/ver}" target="_blank"
+               class="btn btn-outline-primary btn-sm">Ver mi CV actual</a>
+        </div>
+        <p th:unless="${tieneCv}" class="text-muted mb-0">
+            Aún no has subido tu currículum.
+        </p>
+    </div>
+
+    <!-- Formulario de subida -->
+    <div class="card p-4">
+        <h5 class="fw-bold">Subir / reemplazar CV</h5>
+        <p class="text-muted small">Solo se acepta formato <strong>PDF</strong>. Máximo 5 MB.</p>
+
+        <form method="POST" th:action="@{/oferente/curriculum}" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label class="form-label fw-bold">Archivo PDF</label>
+                <input type="file" name="archivo" class="form-control"
+                       accept="application/pdf" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">
+                <span th:text="${tieneCv} ? 'Reemplazar CV' : 'Subir CV'"></span>
+            </button>
+        </form>
+    </div>
+
+    <a th:href="@{/DashboardOferente}" class="btn btn-secondary mt-4">Volver al Dashboard</a>
+</div>
+
+<footer th:replace="~{presentation/fragmentPublic :: footer}"></footer>
+</body>
+</html>

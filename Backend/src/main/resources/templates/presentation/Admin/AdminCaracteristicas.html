@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{presentation/fragmentPublic :: head}"></th:block>
+    <link rel="stylesheet" th:href="@{/css/admin_caracteristicas.css}">
+</head>
+<body>
+
+<section class="Inicio">
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container">
+            <p class="mb-0 d-flex align-items-center">
+                <img src="https://cdn-icons-png.flaticon.com/512/86/86155.png" alt="icono"
+                     style="width:50px;height:50px;filter: brightness(0) invert(1);">
+                <strong class="ms-2 text-white"> Bolsa de Empleo</strong>
+            </p>
+            <div class="navbar-nav ms-auto align-items-center">
+                <a class="nav-link"        th:href="@{/DashboardAdministrador}">Dashboard</a>
+                <a class="nav-link"        th:href="@{/EmpresasPendientes}">Empresas pendientes</a>
+                <a class="nav-link"        th:href="@{/OferentesPendientes}">Oferentes pendientes</a>
+                <a class="nav-link active" th:href="@{/AdminCaracteristicas}">Características</a>
+                <a class="nav-link"        th:href="@{/admin/reportes}">Reportes</a>
+                <a class="nav-link"        th:href="@{/logout}">Salir</a>
+            </div>
+        </div>
+    </nav>
+</section>
+
+<div class="container main-content">
+    <div class="row">
+
+        <!-- ── Columna izquierda: árbol jerárquico ── -->
+        <div class="col-md-7">
+            <h5 class="titulo-seccion">Características registradas</h5>
+
+            <div th:if="${exito}" class="alert alert-success mb-3">
+                 Característica creada correctamente.
+            </div>
+            <div th:if="${error}" class="alert alert-danger mb-3" th:text="${error}"></div>
+
+            <div class="ruta-navegacion mb-3">
+                <span class="badge-ruta">Raíces</span>
+            </div>
+
+            <p th:if="${padres == null or #lists.isEmpty(padres)}" class="text-muted">
+                Aún no hay características. Creá la primera usando el formulario.
+            </p>
+
+            <!--
+                Árbol recursivo:
+                Iteramos las raíces. Para cada nodo usamos el fragment "nodo-arbol"
+                definido más abajo, que se llama a sí mismo para los hijos,
+                nietos, bisnietos, etc. usando el mapa hijos[nodo.id].
+
+                Como Thymeleaf NO soporta recursión nativa en fragments del mismo
+                archivo, usamos un fragmento en un archivo separado:
+                fragmentArbol.html :: nodo-arbol
+
+                Si preferís todo en un archivo, usamos niveles fijos (3 niveles)
+                que cubre la mayoría de los casos de uso académico.
+            -->
+            <ul class="lista-caracteristicas" th:if="${padres != null and not #lists.isEmpty(padres)}">
+
+                <!-- NIVEL 1: Raíces -->
+                <li th:each="n1 : ${padres}" class="item-padre">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="icono-nivel"></span>
+                        <span class="nombre-padre" th:text="${n1.nombre}"></span>
+                        <span class="badge-tipo-padre">Categoría</span>
+                    </div>
+
+                    <!-- NIVEL 2: Hijos directos -->
+                    <ul class="lista-hijos"
+                        th:if="${hijos[n1.id] != null and not #lists.isEmpty(hijos[n1.id])}">
+                        <li th:each="n2 : ${hijos[n1.id]}" class="item-hijo">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="icono-nivel"></span>
+                                <span th:text="${n2.nombre}"></span>
+                            </div>
+
+                            <!-- NIVEL 3: Nietos -->
+                            <ul class="lista-hijos lista-nietos"
+                                th:if="${hijos[n2.id] != null and not #lists.isEmpty(hijos[n2.id])}">
+                                <li th:each="n3 : ${hijos[n2.id]}" class="item-hijo item-nieto">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="icono-nivel"></span>
+                                        <span th:text="${n3.nombre}"></span>
+                                    </div>
+
+                                    <!-- NIVEL 4: Bisnietos -->
+                                    <ul class="lista-hijos lista-bisnietos"
+                                        th:if="${hijos[n3.id] != null and not #lists.isEmpty(hijos[n3.id])}">
+                                        <li th:each="n4 : ${hijos[n3.id]}" class="item-hijo item-bisnieto">
+                                            <span class="icono-nivel">▪</span>
+                                            <span th:text="${n4.nombre}"></span>
+                                        </li>
+                                    </ul>
+
+                                </li>
+                            </ul>
+
+                        </li>
+                    </ul>
+
+                </li>
+            </ul>
+        </div>
+
+        <!-- ── Columna derecha: formulario ── -->
+        <div class="col-md-5">
+            <div class="card card-formulario p-4">
+                <h5 class="fw-bold mb-3" style="color: var(--azul-oscuro);">
+                    Agregar Característica
+                </h5>
+
+                <form method="POST" th:action="@{/admin/caracteristicas/crear}">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Nombre <span class="text-danger">*</span></label>
+                        <input type="text" name="nombre" class="form-control"
+                               placeholder="ej: Java, Docker..." required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Padre (categoría)</label>
+                        <select name="padreId" class="form-select">
+                            <option value="">(sin padre — crear como categoría raíz)</option>
+                            <option th:each="c : ${todas}"
+                                    th:value="${c.id}"
+                                    th:text="${c.nombre}"></option>
+                        </select>
+                        <div class="form-text">
+                            Si elegís "(sin padre)", se crea como categoría principal.
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary-custom w-100">
+                        Crear característica
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    /* Sangría visual por nivel */
+    .lista-nietos    { margin-left: 1.5rem; }
+    .lista-bisnietos { margin-left: 1.5rem; }
+    .item-nieto      { font-size: 0.92rem; color: #374151; }
+    .item-bisnieto   { font-size: 0.88rem; color: #6b7280; }
+    .icono-nivel     { font-size: 0.85rem; }
+</style>
+
+<footer th:replace="~{presentation/fragmentPublic :: footer}"></footer>
+</body>
+</html>

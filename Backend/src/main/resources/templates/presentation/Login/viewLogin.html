@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="~{presentation/fragmentPublic :: head}"></head>
+
+<body>
+<section class="Inicio">
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container">
+            <p>
+                <img src="https://cdn-icons-png.flaticon.com/512/86/86155.png"
+                     alt="icono"
+                     style="width:50px;height:50px;filter: brightness(0) invert(1);">
+                <strong> Bolsa de Empleo</strong>
+            </p>
+            <div class="navbar-nav ms-auto align-items-center">
+                <a class="nav-link" th:href="@{/}">Inicio</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container hero-content text-center">
+        <p class="hero-eyebrow">Accedé a tu cuenta</p>
+        <h1 class="hero-title">Iniciar sesión</h1>
+    </div>
+</section>
+<section class="container login-rapida">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card p-4">
+
+                <h5 class="mb-3 fw-bold text-center">Ingresá tus datos</h5>
+
+                <!-- Mensaje de error de Spring Security (credenciales incorrectas) -->
+                <div th:if="${error}"
+                     class="alert alert-danger"
+                     th:text="${error}">
+                </div>
+
+                <!-- Mensaje de error de validación JS (espacios en blanco) -->
+                <div id="errorBlanco" class="alert alert-danger d-none"></div>
+
+                <form method="POST" th:action="@{/login}" id="formLogin">
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Usuario</label>
+                        <input type="text"
+                               id="loginUsername"
+                               name="username"
+                               class="form-control"
+                               placeholder="empresa-oferente"
+                               required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Contraseña</label>
+                        <input type="password"
+                               id="loginClave"
+                               name="clave"
+                               class="form-control"
+                               placeholder="••••••••"
+                               required>
+                    </div>
+
+                    <button type="submit"
+                            class="btn btn-primary w-100 mt-2">
+                        Entrar
+                    </button>
+
+                </form>
+
+                <!-- Validación JS: bloquea el submit si hay solo espacios -->
+                <script>
+                    document.getElementById('formLogin').addEventListener('submit', function(e) {
+                        const usuario = document.getElementById('loginUsername').value;
+                        const clave   = document.getElementById('loginClave').value;
+                        const err     = document.getElementById('errorBlanco');
+                        if (usuario.trim() === '' || clave.trim() === '') {
+                            e.preventDefault();
+                            err.textContent = 'El usuario y la contraseña no pueden estar en blanco o contener solo espacios.';
+                            err.classList.remove('d-none');
+                        } else {
+                            err.classList.add('d-none');
+                        }
+                    });
+                </script>
+
+                <hr>
+
+                <div class="text-center small">
+                    <a th:href="@{/login/empresa}">Registrar empresa</a>
+                    &nbsp;|&nbsp;
+                    <a th:href="@{/login/oferente}">Registrar oferente</a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer th:replace="~{presentation/fragmentPublic :: footer}"></footer>
+</body>
+</html>

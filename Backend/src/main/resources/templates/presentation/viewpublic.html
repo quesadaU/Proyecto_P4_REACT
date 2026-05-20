@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{presentation/fragmentPublic :: head}"></head>
+<body>
+
+<section th:replace="~{presentation/fragmentPublic :: nav-var}"></section>
+
+<!-- Búsqueda rápida -->
+<section class="container busqueda-rapida">
+    <div class="card p-4">
+        <h5 class="mb-3 fw-bold">Búsqueda rápida de puestos</h5>
+        <div class="row g-3">
+            <div class="col-md-8">
+                <input type="text" class="form-control"
+                       placeholder="Ej: Desarrollador Java, Soporte Técnico...">
+            </div>
+            <div class="col-md-4">
+                <a th:href="@{/buscaPuesto}" class="btn btn-primary w-50">Buscar</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Últimos 5 puestos públicos -->
+<section class="contenedor-puestos">
+    <h2>Últimos puestos públicos</h2>
+
+    <!-- Sin puestos en la BD todavía -->
+    <p th:if="${puestos == null or #lists.isEmpty(puestos)}"
+       class="text-muted text-center py-4">
+        Aún no hay puestos públicos registrados. ¡Volvé pronto!
+    </p>
+
+    <div class="grid-puestos" th:if="${puestos != null and not #lists.isEmpty(puestos)}">
+        <div class="card-puesto" th:each="p : ${puestos}">
+
+            <!-- Nombre de la empresa -->
+            <h3 style="font-weight:bold;"
+                th:text="${p.empresa != null ? p.empresa.nombre : 'Empresa'}"></h3>
+
+            <!-- Descripción del puesto -->
+            <p class="titulo" th:text="${p.descripcion}"></p>
+
+            <!-- Salario -->
+            <p class="salario" th:text="'₡ ' + ${p.salario}"></p>
+
+            <button class="btn-detalle">Ver detalle</button>
+
+            <!-- Detalle al hover -->
+            <div class="detalle">
+                <p><strong>Tipo:</strong>   <span th:text="${p.tipo}"></span></p>
+                <p><strong>Estado:</strong> <span th:text="${p.estado}"></span></p>
+                <p><strong>Fecha:</strong>  <span th:text="${p.fecha}"></span></p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer th:replace="~{presentation/fragmentPublic :: footer}"></footer>
+</body>
+</html>
