@@ -6,7 +6,7 @@ function App() {
 
     useEffect(() => {
         (async () => {
-            const res = await fetch('/api/puestos/recientes');
+            const res = await fetch('/api/root/puestos/recientes');
             if (!res.ok) return;
             setPuestos(await res.json());
         })();
