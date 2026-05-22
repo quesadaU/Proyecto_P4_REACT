@@ -1,100 +1,89 @@
-import { useState, useEffect } from 'react';
 import './index.css';
+import { Link, BrowserRouter, Routes, Route } from 'react-router-dom';
+import { AppProvider } from '@/AppProvider.jsx';
+import Inicio from './pages/inicio/Inicio.jsx';
+import BuscaPuesto from './pages/buscaPuesto/BuscaPuesto.jsx';
+import Empresas from './pages/empresas/Empresas.jsx';
+import Oferentes from './pages/oferentes/Oferentes.jsx';
+import Caracteristicas from './pages/caracteristicas/Caracteristicas.jsx';
+import Puestos from './pages/puestos/Puestos.jsx';
+import Login from './pages/login/Login.jsx';
+import RegistroEmpresa from './pages/registro/RegistroEmpresa.jsx';
+import RegistroOferente from './pages/registro/RegistroOferente.jsx';
+import Pendiente from './pages/pendiente/Pendiente.jsx';
 
 function App() {
-    const [puestos, setPuestos] = useState([]);
-
-    useEffect(() => {
-        (async () => {
-            const res = await fetch('/api/root/puestos/recientes');
-            if (!res.ok) return;
-            setPuestos(await res.json());
-        })();
-    }, []);
-
     return (
-        <>
-            {/* ── Sección Inicio con Navbar + Hero ── */}
-            <section className="Inicio">
-                <nav className="navbar-custom">
-                    <div className="navbar-inner">
-                        <span className="navbar-brand">
-                            <img
-                                src="https://cdn-icons-png.flaticon.com/512/86/86155.png"
-                                alt="icono"
-                                style={{ width: 50, height: 50, filter: 'brightness(0) invert(1)' }}
-                            />
-                            <strong> Bolsa de Empleo</strong>
-                        </span>
-                        <div className="navbar-links">
-                            <a className="nav-link" href="#">Buscar Puesto</a>
-                            <a className="nav-link" href="#">Empresas</a>
-                            <a className="nav-link" href="#">Oferentes</a>
-                            <a className="nav-link-login" href="#">Login</a>
-                        </div>
-                    </div>
-                </nav>
+        <AppProvider>
+            <BrowserRouter>
+                <Header />
+                <Main />
+                <Footer />
+            </BrowserRouter>
+        </AppProvider>
+    );
+}
 
-                <div className="hero-content">
-                    <p className="hero-eyebrow">¿Buscas tu próximo gran proyecto?</p>
-                    <h1 className="hero-title">Encuentra tu próximo empleo</h1>
-                </div>
-            </section>
-
-            {/* ── Búsqueda rápida ── */}
-            <section className="busqueda-rapida">
-                <div className="card">
-                    <h5>Búsqueda rápida de puestos</h5>
-                    <div className="busqueda-row">
-                        <input
-                            type="text"
-                            placeholder="Ej: Desarrollador Java, Soporte Técnico..."
-                        />
-                        <button className="btn-primary">Buscar</button>
-                    </div>
-                </div>
-            </section>
-
-            {/* ── Últimos 5 puestos públicos ── */}
-            <section className="contenedor-puestos">
-                <h2>Últimos puestos públicos</h2>
-
-                {puestos.length === 0 ? (
-                    <p className="text-muted">
-                        Aún no hay puestos públicos registrados. ¡Volvé pronto!
+function Header() {
+    return (
+        <section className="Inicio">
+            <nav className="navbar navbar-expand-lg navbar-custom">
+                <div className="container">
+                    <p>
+                        <img src="https://cdn-icons-png.flaticon.com/512/86/86155.png"
+                             alt="icono"
+                             style={{width:'50px', height:'50px', filter:'brightness(0) invert(1)'}}/>
+                        <strong> Bolsa de Empleo</strong>
                     </p>
-                ) : (
-                    <div className="grid-puestos">
-                        {puestos.map(p => (
-                            <div className="card-puesto" key={p.id}>
-                                <h3>{p.empresa?.nombre ?? 'Empresa'}</h3>
-                                <p className="titulo">{p.descripcion}</p>
-                                <p className="salario">₡ {p.salario}</p>
-                                <div className="detalle">
-                                    <p><strong>Tipo:</strong> {p.tipo}</p>
-                                    <p><strong>Estado:</strong> {p.estado}</p>
-                                    <p><strong>Fecha:</strong> {p.fecha}</p>
-                                </div>
-                            </div>
-                        ))}
+                    <div className="navbar-nav ms-auto align-items-center">
+                        <Link className="nav-link" to="/buscar">Buscar Puesto</Link>
+                        <Link className="nav-link" to="/empresas">Empresas</Link>
+                        <Link className="nav-link" to="/oferentes">Oferentes</Link>
+                        <Link className="nav-link" to="/login">Login</Link>
                     </div>
-                )}
-            </section>
+                </div>
+            </nav>
+            <div className="container hero-content text-center">
+                <p className="hero-eyebrow">¿Buscas tu proximo gran proyecto?</p>
+                <h1 className="hero-title">Encuentra tu próximo empleo</h1>
+            </div>
+        </section>
+    );
+}
 
-            {/* ── Footer ── */}
-            <footer>
-                <div className="footer-inner">
-                    <div>
-                        <strong>Bolsa de Empleo</strong><br />
-                        Estudiantes de Ingeniería en Sistemas de la UNA
+function Main() {
+    return (
+        <Routes>
+            <Route path="/" element={<Inicio />} />
+            <Route path="/buscar" element={<BuscaPuesto />} />
+            <Route path="/empresas" element={<Empresas />} />
+            <Route path="/oferentes" element={<Oferentes />} />
+            <Route path="/caracteristicas" element={<Caracteristicas />} />
+            <Route path="/puestos" element={<Puestos />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/registro/empresa" element={<RegistroEmpresa />} />
+            <Route path="/registro/oferente" element={<RegistroOferente />} />
+            <Route path="/pendiente" element={<Pendiente />} />
+        </Routes>
+    );
+}
+
+function Footer() {
+    return (
+        <footer>
+            <div className="container">
+                <div className="row">
+                    <div className="col-md-6">
+                        <strong>Bolsa de Empleo</strong><br/>
+                        Estudiantes de Ingenieria en Sistemas de la UNA
                     </div>
-                    <div style={{ textAlign: 'right' }}>
-                        Contacto: info@bolsaempleo.local<br />
+                    <div className="col-md-6 text-md-end">
+                        Contacto: info@bolsaempleo.local<br/>
                         Créditos: Universidad Nacional de Costa Rica
                     </div>
                 </div>
-            </footer>
-        </>
+            </div>
+        </footer>
     );
 }
 

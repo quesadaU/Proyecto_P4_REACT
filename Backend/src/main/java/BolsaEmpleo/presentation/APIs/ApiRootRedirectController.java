@@ -1,4 +1,4 @@
-package BolsaEmpleo.presentation;
+package BolsaEmpleo.presentation.APIs;
 
 import BolsaEmpleo.logic.Puesto;
 import BolsaEmpleo.logic.Service;

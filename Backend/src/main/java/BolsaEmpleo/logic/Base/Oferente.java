@@ -1,5 +1,6 @@
 package BolsaEmpleo.logic.Base;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,6 +20,7 @@ public class Oferente {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @JsonIgnore
     @OneToOne
     @JoinColumn(name ="usuario_id")
     private Usuario usuario;
@@ -36,6 +38,7 @@ public class Oferente {
 
 
     // Currículum en formato PDF (guardado como bytes en la BD)
+    @JsonIgnore
     @Lob
     @Column(name = "curriculum", columnDefinition = "LONGBLOB")
     private byte[] curriculum;

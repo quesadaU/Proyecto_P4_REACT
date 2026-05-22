@@ -1,5 +1,6 @@
 package BolsaEmpleo.logic.Base;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,9 +19,10 @@ public class Empresa {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @JsonIgnore
     @OneToOne
     @MapsId
-    @JoinColumn(name = "usuario_id")   // ← nombre explícito de la FK
+    @JoinColumn(name = "usuario_id")
     private Usuario usuario;
 
     private String nombre;

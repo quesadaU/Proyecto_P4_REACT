@@ -1,14 +1,35 @@
 import { createContext, useState } from 'react';
 
-export const AppContext = createContext();
+const AppContext = createContext();
 
-const empty = {
-    puestos:   { list: [], item: { id: '', descripcion: '', salario: 0, tipo: 'PUBLICO', estado: 'ACTIVO', fecha: '' } },
-    empresas:  { list: [], item: { id: '', nombre: '', localizacion: '', correo: '', telefono: '', descripcion: '' } },
-    oferentes: { list: [], item: { id: '', nombre: '', apellido: '', nacionalidad: '', telefono: '', correo: '', residencia: '' } },
-};
+function AppProvider(props) {
+    const [puestosState, setPuestosState] = useState({
+        puestos: [],
+        puesto: { id: '', descripcion: '', salario: 0, tipo: 'PUBLICO', estado: 'ACTIVO', fecha: '' },
+    });
+    const [empresasState, setEmpresasState] = useState({
+        empresas: [],
+        empresa: { id: '', nombre: '', localizacion: '', correo: '', telefono: '', descripcion: '' },
+    });
+    const [oferentesState, setOferentesState] = useState({
+        oferentes: [],
+        oferente: { id: '', nombre: '', apellido: '', nacionalidad: '', telefono: '', correo: '', residencia: '' },
+    });
+    const [caracteristicasState, setCaracteristicasState] = useState({
+        caracteristicas: [],
+        caracteristica: { id: '', nombre: '', padre: null },
+    });
 
-export default function AppProvider({ children }) {
-    const [state, setState] = useState(empty);
-    return <AppContext.Provider value={{ state, setState }}>{children}</AppContext.Provider>;
+    return (
+        <AppContext.Provider value={{
+            puestosState, setPuestosState,
+            empresasState, setEmpresasState,
+            oferentesState, setOferentesState,
+            caracteristicasState, setCaracteristicasState,
+        }}>
+            {props.children}
+        </AppContext.Provider>
+    );
 }
+
+export { AppContext, AppProvider };
