@@ -15,9 +15,22 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
+/**
+ * SecurityConfig adaptada para REST API + React frontend.
+ *
+ * Cambios clave respecto a la versión MVC:
+ *  - CORS global configurado para http://localhost:5173 (Vite dev server).
+ *  - Las sesiones se mantienen (session-based auth) porque React enviará
+ *    la cookie de sesión en cada request (credentials: 'include').
+ *  - Los endpoints /api/** quedan protegidos por rol, igual que antes.
+ *  - Login y logout ahora responden JSON en vez de redirect.
+ */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -31,91 +44,94 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/",
-                                "/buscaPuesto",
-                                "/login",
-                                "/login/empresa",
-                                "/login/oferente",
-                                "/registro/empresa",
-                                "/registro/oferente",
-                                "/css/**",
-                                "/js/**",
-                                "/images/**",
-                                "/api/**"
-                        ).permitAll()
-                        .requestMatchers(
-                                "/DashboardAdministrador",
-                                "/EmpresasPendientes",
-                                "/OferentesPendientes",
-                                "/AdminCaracteristicas",
-                                "/admin/**"
-                        ).hasRole("ADM")
-                        .requestMatchers(
-                                "/DashboardEmpresa",
-                                "/empresa/**"
-                        ).hasRole("EMP")
-                        .requestMatchers(
-                                "/DashboardOferente",
-                                "/oferente/**"
-                        ).hasRole("OFE")
-                        .anyRequest().authenticated()
-                )
-                .formLogin(form -> form
-                        .loginPage("/login")
-                        .loginProcessingUrl("/login")
-                        .usernameParameter("username")
-                        .passwordParameter("clave")
-                        .successHandler((request, response, authentication) -> {
-                            String role = authentication.getAuthorities().iterator()
-                                    .next().getAuthority();
-                            switch (role) {
-                                case "ROLE_ADM" -> response.sendRedirect("/DashboardAdministrador");
-                                case "ROLE_EMP" -> response.sendRedirect("/DashboardEmpresa");
-                                case "ROLE_OFE" -> response.sendRedirect("/DashboardOferente");
-                                default         -> response.sendRedirect("/");
-                            }
-                        })
-                        .failureUrl("/login?error=true")
-                        .permitAll()
-                )
-                .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login")
-                        .invalidateHttpSession(true)
-                        .clearAuthentication(true)
-                        .permitAll()
-                )
-                .csrf(csrf -> csrf.disable());
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(auth -> auth
+                // ── Rutas públicas ──────────────────────────────────────
+                .requestMatchers(
+                    "/api/auth/login",
+                    "/api/auth/logout",
+                    "/api/auth/registro/empresa",
+                    "/api/auth/registro/oferente",
+                    "/api/public/**"
+                ).permitAll()
+                // ── Admin ───────────────────────────────────────────────
+                .requestMatchers("/api/admin/**").hasRole("ADM")
+                // ── Empresa ─────────────────────────────────────────────
+                .requestMatchers("/api/empresa/**").hasRole("EMP")
+                // ── Oferente ────────────────────────────────────────────
+                .requestMatchers("/api/oferente/**").hasRole("OFE")
+                .anyRequest().authenticated()
+            )
+            // Login vía JSON — el cliente React envía { username, clave }
+            .formLogin(form -> form
+                .loginProcessingUrl("/api/auth/login")
+                .usernameParameter("username")
+                .passwordParameter("clave")
+                .successHandler((req, res, auth) -> {
+                    res.setContentType("application/json");
+                    String role = auth.getAuthorities().iterator().next().getAuthority();
+                    String tipo = role.replace("ROLE_", "");
+                    res.getWriter().write("{\"rol\":\"" + tipo + "\",\"username\":\"" + auth.getName() + "\"}");
+                })
+                .failureHandler((req, res, ex) -> {
+                    res.setStatus(401);
+                    res.setContentType("application/json");
+                    res.getWriter().write("{\"error\":\"Usuario o contraseña incorrectos.\"}");
+                })
+                .permitAll()
+            )
+            .logout(logout -> logout
+                .logoutUrl("/api/auth/logout")
+                .logoutSuccessHandler((req, res, auth) -> {
+                    res.setContentType("application/json");
+                    res.getWriter().write("{\"mensaje\":\"Sesión cerrada.\"}");
+                })
+                .invalidateHttpSession(true)
+                .clearAuthentication(true)
+                .permitAll()
+            );
 
         return http.build();
+    }
+
+    /**
+     * CORS: permite que React (localhost:5173) envíe cookies de sesión.
+     * En producción reemplaza el origin por el dominio real.
+     */
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(List.of("http://localhost:5173"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowCredentials(true); // ← obligatorio para enviar cookie de sesión
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
     }
 
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> {
             Usuario usuario = usuarioRepository.findByUsernameOnly(username);
-            if (usuario == null) {
+            if (usuario == null)
                 throw new UsernameNotFoundException("Usuario no encontrado: " + username);
-            }
             return User.builder()
-                    .username(usuario.getUsername())
-                    .password(usuario.getClave())
-                    .authorities(List.of(new SimpleGrantedAuthority("ROLE_" + usuario.getTipo())))
-                    .build();
+                .username(usuario.getUsername())
+                .password(usuario.getClave())
+                .authorities(List.of(new SimpleGrantedAuthority("ROLE_" + usuario.getTipo())))
+                .build();
         };
     }
 
-    // ← ÚNICO CAMBIO AQUÍ: BCryptPasswordEncoder en lugar de NoOpPasswordEncoder
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration config) throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 }
