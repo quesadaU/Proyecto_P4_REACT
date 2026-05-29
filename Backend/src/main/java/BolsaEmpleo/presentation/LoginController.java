@@ -1,130 +1,120 @@
 package BolsaEmpleo.presentation;
 
-import BolsaEmpleo.data.EmpresaRepository;
-import BolsaEmpleo.data.OferentesRepository;
+import BolsaEmpleo.data.UsuarioRepository;
 import BolsaEmpleo.logic.Base.Empresa;
 import BolsaEmpleo.logic.Base.Oferente;
 import BolsaEmpleo.logic.Base.Usuario;
 import BolsaEmpleo.logic.Service;
-import org.springframework.beans.factory.annotation.Autowired;
+import BolsaEmpleo.security.TokenService;
+import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
-@Controller
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/auth")
+@AllArgsConstructor
 public class LoginController {
 
-    @Autowired private Service service;
-    @Autowired private EmpresaRepository  empresaRepo;
-    @Autowired private OferentesRepository oferenteRepo;
-    @Autowired private PasswordEncoder passwordEncoder;
+    private final Service          service;
+    private final UsuarioRepository usuarioRepository;
+    private final TokenService     tokenService;
+    private final PasswordEncoder  passwordEncoder;
 
-    @GetMapping("/login")
-    public String mostrarLogin(
-            @RequestParam(required = false) String error,
-            Model model) {
-        if (error != null) {
-            model.addAttribute("error", "Usuario o contraseña incorrectos.");
+    // ── Login ─────────────────────────────────────────────────────────────────
+    // POST /api/auth/login
+    // Body: { "username": "admin1", "clave": "1234" }
+    // Response: "eyJhbGci..." (token JWT como texto plano)
+    @PostMapping("/login")
+    public String login(@RequestBody Map<String, String> body) {
+        String username = body.get("username");
+        String clave    = body.get("clave");
+        try {
+            Usuario u = usuarioRepository.findByUsernameOnly(username);
+            if (u == null || !passwordEncoder.matches(clave, u.getClave())) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+            }
+            return tokenService.generateToken(u);
+        } catch (ResponseStatusException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
-        return "presentation/Login/viewLogin";
     }
 
-    @GetMapping("/login/empresa")
-    public String mostrarRegistroEmpresa() {
-        return "presentation/Login/viewRegistroEmpresa";
-    }
-
-    @GetMapping("/login/oferente")
-    public String mostrarRegistroOferente() {
-        return "presentation/Login/viewRegistroOferente";
-    }
-
+    // ── Registro Empresa ──────────────────────────────────────────────────────
+    // POST /api/auth/registro/empresa
+    // Body: { "username","clave","nombre","localizacion","correo","telefono","descripcion" }
+    // Response 201: { "mensaje": "Empresa registrada. Pendiente de aprobación." }
     @PostMapping("/registro/empresa")
-    public String registrarEmpresa(
-            @RequestParam String username,
-            @RequestParam String clave,
-            @RequestParam String nombre,
-            @RequestParam String localizacion,
-            @RequestParam String correo,
-            @RequestParam String telefono,
-            @RequestParam String descripcion,
-            Model model) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public Map<String, String> registrarEmpresa(@RequestBody Map<String, String> body) {
+        String username = body.get("username");
+        String clave    = body.get("clave");
+        if (username == null || username.trim().isEmpty() ||
+                clave    == null || clave.trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "El usuario y la contraseña no pueden estar en blanco.");
+        }
         try {
-            // ← VALIDACIÓN: no permite espacios en blanco
-            if (username.trim().isEmpty() || clave.trim().isEmpty()) {
-                model.addAttribute("error", "El usuario y la contraseña no pueden estar en blanco o contener solo espacios.");
-                return "presentation/Login/viewRegistroEmpresa";
-            }
+            Usuario u = new Usuario();
+            u.setUsername(username);
+            u.setClave(passwordEncoder.encode(clave));
+            u.setTipo("EMP");
 
-            Usuario nuevoUsuario = new Usuario();
-            nuevoUsuario.setUsername(username);
-            nuevoUsuario.setClave(passwordEncoder.encode(clave));
-            nuevoUsuario.setTipo("EMP");
+            Empresa e = new Empresa();
+            e.setUsuario(u);
+            e.setNombre(body.get("nombre"));
+            e.setLocalizacion(body.get("localizacion"));
+            e.setCorreo(body.get("correo"));
+            e.setTelefono(body.get("telefono"));
+            e.setDescripcion(body.get("descripcion"));
+            e.setAprobada(false);
 
-            Empresa nuevaEmpresa = new Empresa();
-            nuevaEmpresa.setUsuario(nuevoUsuario);
-            nuevaEmpresa.setNombre(nombre);
-            nuevaEmpresa.setLocalizacion(localizacion);
-            nuevaEmpresa.setCorreo(correo);
-            nuevaEmpresa.setTelefono(telefono);
-            nuevaEmpresa.setDescripcion(descripcion);
-            nuevaEmpresa.setAprobada(false);
-
-            service.registrarEmpresa(nuevoUsuario, nuevaEmpresa);
-
-            model.addAttribute("tipo", "EMP");
-            return "presentation/Login/pendienteAprobacion";
-
-        } catch (Exception e) {
-            model.addAttribute("error", "Error al registrar: " + e.getMessage());
-            return "presentation/Login/viewRegistroEmpresa";
+            service.registrarEmpresa(u, e);
+            return Map.of("mensaje", "Empresa registrada. Pendiente de aprobacion.");
+        } catch (Exception ex) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, ex.getMessage());
         }
     }
 
+    // ── Registro Oferente ─────────────────────────────────────────────────────
+    // POST /api/auth/registro/oferente
+    // Body: { "username","clave","nombre","apellido","nacionalidad","telefono","correo","residencia" }
+    // Response 201: { "mensaje": "Oferente registrado. Pendiente de aprobación." }
     @PostMapping("/registro/oferente")
-    public String registrarOferente(
-            @RequestParam String username,
-            @RequestParam String clave,
-            @RequestParam String nombre,
-            @RequestParam String apellido,
-            @RequestParam String nacionalidad,
-            @RequestParam String telefono,
-            @RequestParam String correo,
-            @RequestParam String residencia,
-            Model model) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public Map<String, String> registrarOferente(@RequestBody Map<String, String> body) {
+        String username = body.get("username");
+        String clave    = body.get("clave");
+        if (username == null || username.trim().isEmpty() ||
+                clave    == null || clave.trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "El usuario y la contraseña no pueden estar en blanco.");
+        }
         try {
-            // ← VALIDACIÓN: no permite espacios en blanco
-            if (username.trim().isEmpty() || clave.trim().isEmpty()) {
-                model.addAttribute("error", "El usuario y la contraseña no pueden estar en blanco o contener solo espacios.");
-                return "presentation/Login/viewRegistroOferente";
-            }
+            Usuario u = new Usuario();
+            u.setUsername(username);
+            u.setClave(passwordEncoder.encode(clave));
+            u.setTipo("OFE");
 
-            Usuario nuevoUsuario = new Usuario();
-            nuevoUsuario.setUsername(username);
-            nuevoUsuario.setClave(passwordEncoder.encode(clave));
-            nuevoUsuario.setTipo("OFE");
+            Oferente o = new Oferente();
+            o.setUsuario(u);
+            o.setNombre(body.get("nombre"));
+            o.setApellido(body.get("apellido"));
+            o.setNacionalidad(body.get("nacionalidad"));
+            o.setTelefono(body.get("telefono"));
+            o.setCorreo(body.get("correo"));
+            o.setResidencia(body.get("residencia"));
+            o.setAprobado(false);
 
-            Oferente nuevoOferente = new Oferente();
-            nuevoOferente.setUsuario(nuevoUsuario);
-            nuevoOferente.setNombre(nombre);
-            nuevoOferente.setApellido(apellido);
-            nuevoOferente.setNacionalidad(nacionalidad);
-            nuevoOferente.setTelefono(telefono);
-            nuevoOferente.setCorreo(correo);
-            nuevoOferente.setResidencia(residencia);
-            nuevoOferente.setAprobado(false);
-
-            service.registrarOferente(nuevoUsuario, nuevoOferente);
-
-            model.addAttribute("tipo", "OFE");
-            return "presentation/Login/pendienteAprobacion";
-
-        } catch (Exception e) {
-            model.addAttribute("error", "Error al registrar: " + e.getMessage());
-            return "presentation/Login/viewRegistroOferente";
+            service.registrarOferente(u, o);
+            return Map.of("mensaje", "Oferente registrado. Pendiente de aprobacion.");
+        } catch (Exception ex) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, ex.getMessage());
         }
     }
 }

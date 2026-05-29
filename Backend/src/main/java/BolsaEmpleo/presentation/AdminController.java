@@ -6,19 +6,15 @@ import BolsaEmpleo.logic.Service;
 import com.lowagie.text.*;
 import com.lowagie.text.Font;
 import com.lowagie.text.Rectangle;
-import com.lowagie.text.pdf.PdfPCell;
-import com.lowagie.text.pdf.PdfPTable;
-import com.lowagie.text.pdf.PdfWriter;
+import com.lowagie.text.pdf.*;
 import com.lowagie.text.pdf.draw.LineSeparator;
-import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import lombok.AllArgsConstructor;
+import org.springframework.http.*;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.awt.*;
+import java.awt.Color;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.Month;
 import java.time.format.TextStyle;
@@ -27,121 +23,109 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-/*
- * Las rutas /DashboardAdministrador, /EmpresasPendientes, etc.
- * ya están protegidas con hasRole("ADM") en SecurityConfig.
- * Spring Security rechaza cualquier acceso sin ese rol ANTES
- * de que la petición llegue aquí (según el flujo del PDF).
- * Por eso ya no necesitamos verificar la sesión manualmente.
- */
-@Controller
+@RestController
+@RequestMapping("/api/admin")
+@AllArgsConstructor
 public class AdminController {
 
-    @Autowired
-    private Service service;
+    private final Service service;
 
-    @GetMapping("/DashboardAdministrador")
-    public String mostrar_DashboardAdmin() {
-        return "presentation/Admin/DashboardAdmin";
+    // ── Empresas Pendientes ───────────────────────────────────────────────────
+    // GET /api/admin/empresas/pendientes
+    // Response: [ { id, nombre, localizacion, correo, telefono, descripcion, aprobada:false }, ... ]
+    @GetMapping("/empresas/pendientes")
+    public List<?> empresasPendientes() {
+        return service.findAll_EmpresasNoAprobadas();
     }
 
-    @GetMapping("/EmpresasPendientes")
-    public String mostrar_EmpresasPendientes(Model model) {
-        model.addAttribute("empresasPendientes", service.findAll_EmpresasNoAprobadas());
-        return "presentation/Admin/AdminEmpresasPendientes";
-    }
-
-    @PostMapping("/admin/empresas/aprobar")
-    public String aprobarEmpresa(@RequestParam Integer id) {
-        service.aprobarEmpresa(id);
-        return "redirect:/EmpresasPendientes";
-    }
-
-    @GetMapping("/OferentesPendientes")
-    public String mostrar_OferentesPendientes(Model model) {
-        model.addAttribute("oferentesPendientes", service.findAll_Oferentes_NoAprobadas());
-        return "presentation/Admin/AdminOferentePendiente";
-    }
-
-    @PostMapping("/admin/oferentes/aprobar")
-    public String aprobarOferente(@RequestParam Integer id) {
-        service.aprobarOferente(id);
-        return "redirect:/OferentesPendientes";
-    }
-
-    // ══════════════════════════════════════════════════════
-    //  Características — árbol completo (recursivo en Service)
-    // ══════════════════════════════════════════════════════
-
-    @GetMapping("/AdminCaracteristicas")
-    public String mostrar_Caracteristicas(
-            @RequestParam(required = false) String exito,
-            @RequestParam(required = false) String error,
-            Model model) {
-
-        // Raíces
-        List<Caracteristicas> padres = service.findPadresCaracteristicas();
-
-        // Mapa recursivo: para cada nodo, sus hijos directos
-        // El HTML itera recursivamente usando el mismo mapa
-        Map<Integer, List<Caracteristicas>> hijos = new HashMap<>();
-        service.construirMapaHijos(padres, hijos);
-
-        // Todas para el <select> del formulario
-        List<Caracteristicas> todas = service.findAll_Caracteristicas();
-
-        model.addAttribute("padres", padres);
-        model.addAttribute("hijos", hijos);
-        model.addAttribute("todas", todas);
-
-        if (exito != null) model.addAttribute("exito", true);
-        if (error  != null) model.addAttribute("error", error);
-
-        return "presentation/Admin/AdminCaracteristicas";
-    }
-
-    @PostMapping("/admin/caracteristicas/crear")
-    public String crearCaracteristica(
-            @RequestParam String nombre,
-            @RequestParam(required = false) Integer padreId) {
+    // POST /api/admin/empresas/{id}/aprobar
+    // Response: { "mensaje": "Empresa aprobada." }
+    @PostMapping("/empresas/{id}/aprobar")
+    public Map<String, String> aprobarEmpresa(@PathVariable Integer id) {
         try {
-            service.crearCaracteristica(nombre, padreId);
-            return "redirect:/AdminCaracteristicas?exito=true";
+            service.aprobarEmpresa(id);
+            return Map.of("mensaje", "Empresa aprobada.");
         } catch (Exception e) {
-            return "redirect:/AdminCaracteristicas?error=" + e.getMessage();
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         }
     }
 
-    // ══════════════════════════════════════════════════════
-    //  Reportes
-    // ══════════════════════════════════════════════════════
-
-    @GetMapping("/admin/reportes")
-    public String mostrar_Reportes(Model model) {
-        int anioActual = java.time.LocalDate.now().getYear();
-        List<Integer> anios = service.aniosDisponibles();
-        if (anios.isEmpty()) anios = List.of(anioActual);
-        model.addAttribute("anios", anios);
-        model.addAttribute("anioActual", anioActual);
-        return "presentation/Admin/AdminReportes";
+    // ── Oferentes Pendientes ──────────────────────────────────────────────────
+    // GET /api/admin/oferentes/pendientes
+    // Response: [ { id, nombre, apellido, nacionalidad, correo, telefono, residencia, aprobado:false }, ... ]
+    @GetMapping("/oferentes/pendientes")
+    public List<?> oferentesPendientes() {
+        return service.findAll_Oferentes_NoAprobadas();
     }
 
-    @GetMapping("/admin/reportes/pdf")
-    public void generar_ReportePDF(
+    // POST /api/admin/oferentes/{id}/aprobar
+    // Response: { "mensaje": "Oferente aprobado." }
+    @PostMapping("/oferentes/{id}/aprobar")
+    public Map<String, String> aprobarOferente(@PathVariable Integer id) {
+        try {
+            service.aprobarOferente(id);
+            return Map.of("mensaje", "Oferente aprobado.");
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        }
+    }
+
+    // ── Características ───────────────────────────────────────────────────────
+    // GET /api/admin/caracteristicas
+    // Response: { "padres": [...], "hijos": { "1": [...] }, "todas": [...] }
+    @GetMapping("/caracteristicas")
+    public Map<String, Object> caracteristicas() {
+        List<Caracteristicas> padres = service.findPadresCaracteristicas();
+        Map<Integer, List<Caracteristicas>> hijos = new HashMap<>();
+        service.construirMapaHijos(padres, hijos);
+        List<Caracteristicas> todas = service.findAll_Caracteristicas();
+        Map<String, Object> result = new HashMap<>();
+        result.put("padres", padres);
+        result.put("hijos",  hijos);
+        result.put("todas",  todas);
+        return result;
+    }
+
+    // POST /api/admin/caracteristicas
+    // Body: { "nombre": "Python", "padreId": 1 }   (padreId es opcional)
+    // Response 201: { "mensaje": "Caracteristica creada." }
+    @PostMapping("/caracteristicas")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Map<String, String> crearCaracteristica(@RequestBody Map<String, Object> body) {
+        try {
+            String  nombre  = (String) body.get("nombre");
+            Integer padreId = body.get("padreId") != null ? (Integer) body.get("padreId") : null;
+            service.crearCaracteristica(nombre, padreId);
+            return Map.of("mensaje", "Caracteristica creada.");
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
+    // ── Reportes ──────────────────────────────────────────────────────────────
+    // GET /api/admin/reportes/anios
+    // Response: [2024, 2025, 2026]
+    @GetMapping("/reportes/anios")
+    public List<Integer> aniosDisponibles() {
+        List<Integer> anios = service.aniosDisponibles();
+        if (anios.isEmpty()) anios = List.of(java.time.LocalDate.now().getYear());
+        return anios;
+    }
+
+    // GET /api/admin/reportes/pdf?anio=2026&mes=5
+    // Response: PDF binario (application/pdf)
+    @GetMapping("/reportes/pdf")
+    public ResponseEntity<byte[]> generarReportePDF(
             @RequestParam int anio,
-            @RequestParam int mes,
-            HttpServletResponse response) throws IOException {
+            @RequestParam int mes) throws IOException {
 
         List<Puesto> puestos = service.puestosPorMes(anio, mes);
         String nombreMes = Month.of(mes).getDisplayName(TextStyle.FULL, new Locale("es", "CR"));
         nombreMes = nombreMes.substring(0, 1).toUpperCase() + nombreMes.substring(1);
 
-        response.setContentType("application/pdf");
-        response.setHeader("Content-Disposition",
-                "attachment; filename=\"reporte_puestos_" + anio + "_" + String.format("%02d", mes) + ".pdf\"");
-
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Document doc = new Document(PageSize.A4, 50, 50, 60, 50);
-        PdfWriter.getInstance(doc, response.getOutputStream());
+        PdfWriter.getInstance(doc, baos);
         doc.open();
 
         Font fTitulo    = new Font(Font.HELVETICA, 18, Font.BOLD,   new Color(30, 58, 138));
@@ -155,7 +139,7 @@ public class AdminController {
         titulo.setAlignment(Element.ALIGN_CENTER);
         doc.add(titulo);
 
-        Paragraph subtitulo = new Paragraph("Período: " + nombreMes + " " + anio, fSubtitulo);
+        Paragraph subtitulo = new Paragraph("Periodo: " + nombreMes + " " + anio, fSubtitulo);
         subtitulo.setAlignment(Element.ALIGN_CENTER);
         subtitulo.setSpacingAfter(6);
         doc.add(subtitulo);
@@ -174,22 +158,23 @@ public class AdminController {
         resumen.setWidthPercentage(100);
         resumen.setSpacingAfter(14);
         Color bgResumen = new Color(239, 246, 255);
-        String[] etiquetas = {"Total de puestos", "Activos", "Inactivos", "Públicos / Privados"};
+        String[] etiquetas = {"Total de puestos", "Activos", "Inactivos", "Publicos / Privados"};
         String[] valores   = {String.valueOf(puestos.size()), String.valueOf(activos),
                 String.valueOf(inactivos), publicos + " / " + privados};
         for (int i = 0; i < 4; i++) {
             PdfPCell cEtiq = new PdfPCell(new Phrase(etiquetas[i], fResumen));
-            cEtiq.setBackgroundColor(bgResumen); cEtiq.setBorderColor(new Color(191,219,254)); cEtiq.setPadding(6);
+            cEtiq.setBackgroundColor(bgResumen); cEtiq.setBorderColor(new Color(191, 219, 254)); cEtiq.setPadding(6);
             resumen.addCell(cEtiq);
             PdfPCell cVal = new PdfPCell(new Phrase(valores[i], fResumenB));
-            cVal.setBackgroundColor(bgResumen); cVal.setBorderColor(new Color(191,219,254));
+            cVal.setBackgroundColor(bgResumen); cVal.setBorderColor(new Color(191, 219, 254));
             cVal.setPadding(6); cVal.setHorizontalAlignment(Element.ALIGN_CENTER);
             resumen.addCell(cVal);
         }
         doc.add(resumen);
 
         if (puestos.isEmpty()) {
-            Paragraph vacio = new Paragraph("No se registraron puestos en " + nombreMes + " " + anio + ".",
+            Paragraph vacio = new Paragraph(
+                    "No se registraron puestos en " + nombreMes + " " + anio + ".",
                     new Font(Font.HELVETICA, 11, Font.ITALIC, new Color(107, 114, 128)));
             vacio.setAlignment(Element.ALIGN_CENTER); vacio.setSpacingBefore(20);
             doc.add(vacio);
@@ -197,13 +182,13 @@ public class AdminController {
             PdfPTable tabla = new PdfPTable(new float[]{1.5f, 3.5f, 1.5f, 1.5f, 1.5f, 1.5f});
             tabla.setWidthPercentage(100); tabla.setSpacingBefore(4);
             Color bgHeader = new Color(30, 58, 138);
-            for (String h : new String[]{"ID", "Descripción", "Empresa", "Tipo", "Estado", "Fecha"}) {
+            for (String h : new String[]{"ID", "Descripcion", "Empresa", "Tipo", "Estado", "Fecha"}) {
                 PdfPCell cell = new PdfPCell(new Phrase(h, fHeader));
                 cell.setBackgroundColor(bgHeader); cell.setPadding(7);
                 cell.setHorizontalAlignment(Element.ALIGN_CENTER); cell.setBorder(Rectangle.NO_BORDER);
                 tabla.addCell(cell);
             }
-            Color bgPar = new Color(248,250,252), bgImpar = Color.WHITE, border = new Color(226,232,240);
+            Color bgPar = new Color(248, 250, 252), bgImpar = Color.WHITE, border = new Color(226, 232, 240);
             for (int i = 0; i < puestos.size(); i++) {
                 Puesto p = puestos.get(i);
                 Color bgFila = (i % 2 == 0) ? bgPar : bgImpar;
@@ -222,10 +207,17 @@ public class AdminController {
             doc.add(tabla);
         }
 
-        Paragraph pie = new Paragraph("Generado el " + java.time.LocalDate.now() + " · Sistema Bolsa de Empleo",
+        Paragraph pie = new Paragraph(
+                "Generado el " + java.time.LocalDate.now() + " · Sistema Bolsa de Empleo",
                 new Font(Font.HELVETICA, 8, Font.ITALIC, new Color(156, 163, 175)));
         pie.setAlignment(Element.ALIGN_RIGHT); pie.setSpacingBefore(16);
         doc.add(pie);
         doc.close();
+
+        String filename = "reporte_puestos_" + anio + "_" + String.format("%02d", mes) + ".pdf";
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                .body(baos.toByteArray());
     }
 }

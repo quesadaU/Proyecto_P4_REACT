@@ -5,183 +5,183 @@ import BolsaEmpleo.logic.Base.Empresa;
 import BolsaEmpleo.logic.Base.Oferente;
 import BolsaEmpleo.logic.Base.Usuario;
 import BolsaEmpleo.logic.OferenteHabilidades;
+import BolsaEmpleo.logic.Puesto;
+import BolsaEmpleo.logic.PuestoHabilidades;
 import BolsaEmpleo.logic.Service;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import lombok.AllArgsConstructor;
+import org.springframework.http.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.security.Principal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-@Controller
+@RestController
+@RequestMapping("/api/empresa")
+@AllArgsConstructor
 public class EmpresaController {
 
-    @Autowired private Service           service;
-    @Autowired private UsuarioRepository usuarioRepo;
+    private final Service           service;
+    private final UsuarioRepository usuarioRepo;
 
-    private Empresa getEmpresa(Principal principal) {
-        Usuario u = usuarioRepo.findByUsernameOnly(principal.getName());
-        return service.empresaByUsuario(u.getId());
+    // Extrae la empresa del token JWT (campo "id" = usuarioId)
+    private Empresa getEmpresa(Jwt jwt) {
+        Integer usuarioId = ((Number) jwt.getClaims().get("id")).intValue();
+        return service.empresaByUsuario(usuarioId);
     }
 
-    // ── Dashboard ─────────────────────────────────────────────────
-
-    @GetMapping("/DashboardEmpresa")
-    public String mostrar_DashboardEmpresa(Principal principal, Model model) {
-        Empresa empresa = getEmpresa(principal);
-        if (!empresa.isAprobada()) {
-            model.addAttribute("tipo", "EMP");
-            return "presentation/Login/pendienteAprobacion";
-        }
-        model.addAttribute("empresa", empresa);
-        return "presentation/Empresa/DashboardEmpresa";
+    // ── Dashboard / Perfil ────────────────────────────────────────────────────
+    // GET /api/empresa/perfil
+    // Response: { id, nombre, localizacion, correo, telefono, descripcion, aprobada }
+    @GetMapping("/perfil")
+    public Map<String, Object> perfil(@AuthenticationPrincipal Jwt jwt) {
+        Empresa e = getEmpresa(jwt);
+        Map<String, Object> r = new HashMap<>();
+        r.put("id",           e.getId());
+        r.put("nombre",       e.getNombre());
+        r.put("localizacion", e.getLocalizacion());
+        r.put("correo",       e.getCorreo());
+        r.put("telefono",     e.getTelefono());
+        r.put("descripcion",  e.getDescripcion());
+        r.put("aprobada",     e.isAprobada());
+        return r;
     }
 
-    // ── Editar empresa ────────────────────────────────────────────
-
-    @GetMapping("/empresa/editar")
-    public String mostrar_EditarEmpresa(Principal principal, Model model) {
-        model.addAttribute("empresa", getEmpresa(principal));
-        return "presentation/Empresa/EditarEmpresa";
-    }
-
-    @PostMapping("/empresa/editar")
-    public String guardar_EditarEmpresa(
-            @RequestParam String nombre,
-            @RequestParam String localizacion,
-            @RequestParam String correo,
-            @RequestParam String telefono,
-            @RequestParam String descripcion,
-            Principal principal, Model model) {
+    // PUT /api/empresa/perfil
+    // Body: { "nombre","localizacion","correo","telefono","descripcion" }
+    // Response: { "mensaje": "Perfil actualizado." }
+    @PutMapping("/perfil")
+    public Map<String, String> editarPerfil(
+            @RequestBody Map<String, String> body,
+            @AuthenticationPrincipal Jwt jwt) {
         try {
-            Empresa empresa = getEmpresa(principal);
-            empresa.setNombre(nombre); empresa.setLocalizacion(localizacion);
-            empresa.setCorreo(correo); empresa.setTelefono(telefono);
-            empresa.setDescripcion(descripcion);
-            service.empresaUpdate(empresa);
-            return "redirect:/DashboardEmpresa?exito=true";
-        } catch (Exception e) {
-            model.addAttribute("error", "Error al guardar: " + e.getMessage());
-            model.addAttribute("empresa", getEmpresa(principal));
-            return "presentation/Empresa/EditarEmpresa";
+            Empresa e = getEmpresa(jwt);
+            e.setNombre(body.get("nombre"));
+            e.setLocalizacion(body.get("localizacion"));
+            e.setCorreo(body.get("correo"));
+            e.setTelefono(body.get("telefono"));
+            e.setDescripcion(body.get("descripcion"));
+            service.empresaUpdate(e);
+            return Map.of("mensaje", "Perfil actualizado.");
+        } catch (Exception ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
         }
     }
 
-    // ── Mis puestos ───────────────────────────────────────────────
-
-    @GetMapping("/empresa/puestos")
-    public String mostrar_MisPuestos(Principal principal, Model model) {
-        Empresa empresa = getEmpresa(principal);
-        model.addAttribute("empresa", empresa);
-        model.addAttribute("puestos", service.puestosByEmpresa(empresa.getId()));
-        return "presentation/Empresa/MisPuestos";
+    // ── Puestos ───────────────────────────────────────────────────────────────
+    // GET /api/empresa/puestos
+    // Response: [ { id, descripcion, salario, tipo, estado, fecha }, ... ]
+    @GetMapping("/puestos")
+    public List<Puesto> misPuestos(@AuthenticationPrincipal Jwt jwt) {
+        Empresa e = getEmpresa(jwt);
+        return service.puestosByEmpresa(e.getId());
     }
 
-    // ── Nuevo puesto ──────────────────────────────────────────────
-
-    @GetMapping("/empresa/puestos/nuevo")
-    public String mostrar_NuevoPuesto(Model model) {
-        model.addAttribute("caracteristicas", service.findAll_Caracteristicas());
-        return "presentation/Empresa/NuevoPuesto";
-    }
-
-    @PostMapping("/empresa/puestos/nuevo")
-    public String crear_Puesto(
-            @RequestParam String descripcion,
-            @RequestParam Integer salario,
-            @RequestParam String tipo,
-            Principal principal, Model model) {
+    // POST /api/empresa/puestos
+    // Body: { "descripcion": "Dev Java", "salario": 1500000, "tipo": "PUBLICO" }
+    // Response 201: { "mensaje": "Puesto creado." }
+    @PostMapping("/puestos")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Map<String, String> crearPuesto(
+            @RequestBody Map<String, Object> body,
+            @AuthenticationPrincipal Jwt jwt) {
         try {
-            service.crearPuesto(getEmpresa(principal), descripcion, salario, tipo);
-            return "redirect:/empresa/puestos?exito=true";
-        } catch (Exception e) {
-            model.addAttribute("error", "Error al crear el puesto: " + e.getMessage());
-            model.addAttribute("caracteristicas", service.findAll_Caracteristicas());
-            return "presentation/Empresa/NuevoPuesto";
+            Empresa e    = getEmpresa(jwt);
+            String  desc = (String)  body.get("descripcion");
+            Integer sal  = (Integer) body.get("salario");
+            String  tipo = (String)  body.get("tipo");
+            service.crearPuesto(e, desc, sal, tipo);
+            return Map.of("mensaje", "Puesto creado.");
+        } catch (Exception ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
         }
     }
 
-    // ── Habilidades de un puesto ──────────────────────────────────
-
-    @PostMapping("/empresa/puestos/habilidad")
-    public String agregar_HabilidadPuesto(
-            @RequestParam Integer puestoId,
-            @RequestParam Integer caracteristicaId,
-            @RequestParam Integer nivel) {
-        service.agregarHabilidadPuesto(puestoId, caracteristicaId, nivel);
-        return "redirect:/empresa/puestos/" + puestoId;
+    // GET /api/empresa/puestos/{id}
+    // Response: { "puesto":{...}, "habilidades":[...], "caracteristicas":[...] }
+    @GetMapping("/puestos/{id}")
+    public Map<String, Object> detallePuesto(@PathVariable Integer id) {
+        try {
+            Puesto p = service.PuestoRead(id);
+            List<PuestoHabilidades> habs = service.habilidadesByPuesto(id);
+            Map<String, Object> r = new HashMap<>();
+            r.put("puesto",          p);
+            r.put("habilidades",     habs);
+            r.put("caracteristicas", service.findAll_Caracteristicas());
+            return r;
+        } catch (Exception ex) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
+        }
     }
 
-    @PostMapping("/empresa/puestos/habilidad/eliminar")  // ← NUEVO
-    public String eliminar_HabilidadPuesto(
-            @RequestParam Integer habilidadId,
-            @RequestParam Integer puestoId) {
+    // POST /api/empresa/puestos/{id}/desactivar
+    // Response: { "mensaje": "Puesto desactivado." }
+    @PostMapping("/puestos/{id}/desactivar")
+    public Map<String, String> desactivarPuesto(@PathVariable Integer id) {
+        service.desactivarPuesto(id);
+        return Map.of("mensaje", "Puesto desactivado.");
+    }
+
+    // ── Habilidades del Puesto ────────────────────────────────────────────────
+    // POST /api/empresa/puestos/habilidad
+    // Body: { "puestoId": 3, "caracteristicaId": 2, "nivel": 3 }
+    // Response 201: { "mensaje": "Habilidad agregada." }
+    @PostMapping("/puestos/habilidad")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Map<String, String> agregarHabilidad(@RequestBody Map<String, Integer> body) {
+        service.agregarHabilidadPuesto(body.get("puestoId"), body.get("caracteristicaId"), body.get("nivel"));
+        return Map.of("mensaje", "Habilidad agregada.");
+    }
+
+    // DELETE /api/empresa/puestos/habilidad/{habilidadId}
+    // Response: { "mensaje": "Habilidad eliminada." }
+    @DeleteMapping("/puestos/habilidad/{habilidadId}")
+    public Map<String, String> eliminarHabilidad(@PathVariable Integer habilidadId) {
         service.Puesto_hab_delete(habilidadId);
-        return "redirect:/empresa/puestos/" + puestoId;
+        return Map.of("mensaje", "Habilidad eliminada.");
     }
 
-    @GetMapping("/empresa/puestos/{id}")
-    public String mostrar_DetallePuesto(@PathVariable Integer id, Model model) {
-        model.addAttribute("puesto", service.PuestoRead(id));
-        model.addAttribute("habilidades", service.habilidadesByPuesto(id));
-        model.addAttribute("caracteristicas", service.findAll_Caracteristicas());
-        return "presentation/Empresa/DetallePuesto";
+    // ── Candidatos ────────────────────────────────────────────────────────────
+    // GET /api/empresa/candidatos?puestoId=3
+    // Response: { "puesto":{...}, "candidatos":[{ oferente:{...}, coincidencias:N }, ...] }
+    @GetMapping("/candidatos")
+    public Map<String, Object> candidatos(@RequestParam Integer puestoId) {
+        Puesto p = service.PuestoRead(puestoId);
+        Map<String, Object> r = new HashMap<>();
+        r.put("puesto",     p);
+        r.put("candidatos", service.calcularCandidatos(puestoId));
+        return r;
     }
 
-    // ── Desactivar puesto ─────────────────────────────────────────
-
-    @PostMapping("/empresa/puestos/desactivar")
-    public String desactivar_Puesto(@RequestParam Integer puestoId) {
-        service.desactivarPuesto(puestoId);
-        return "redirect:/empresa/puestos";
-    }
-
-    // ── Candidatos ────────────────────────────────────────────────
-
-    @GetMapping("/empresa/candidatos")
-    public String mostrar_Candidatos(@RequestParam Integer puestoId, Model model) {
-        model.addAttribute("puesto", service.PuestoRead(puestoId));
-        model.addAttribute("candidatos", service.calcularCandidatos(puestoId));
-        return "presentation/Empresa/Candidatos";
-    }
-
-    @GetMapping("/empresa/candidatos/detalle")
-    public String mostrar_DetalleOferente(
-            @RequestParam Integer oferenteId,
-            @RequestParam(required = false) Integer puestoId,
-            Model model) {
-
-        Oferente oferente = service.findAll_Oferentes().stream()
-                .filter(o -> o.getId().equals(oferenteId)).findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Oferente no encontrado"));
-
-        List<OferenteHabilidades> habilidades = service.findAll_Oferente_hab().stream()
+    // GET /api/empresa/candidatos/{oferenteId}
+    // Response: { "oferente":{...}, "habilidades":[...], "tieneCv": true/false }
+    @GetMapping("/candidatos/{oferenteId}")
+    public Map<String, Object> detalleOferente(@PathVariable Integer oferenteId) {
+        Oferente o = service.findAll_Oferentes().stream()
+                .filter(of -> of.getId().equals(oferenteId)).findFirst()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        List<OferenteHabilidades> habs = service.findAll_Oferente_hab().stream()
                 .filter(h -> h.getOferente().getId().equals(oferenteId)).toList();
-
-        model.addAttribute("oferente", oferente);
-        model.addAttribute("habilidades", habilidades);
-        model.addAttribute("tieneCv", oferente.getCurriculum() != null);
-        model.addAttribute("urlVolver", puestoId != null
-                ? "/empresa/candidatos?puestoId=" + puestoId : "/empresa/puestos");
-        return "presentation/Empresa/DetalleOferente";
+        Map<String, Object> r = new HashMap<>();
+        r.put("oferente",    o);
+        r.put("habilidades", habs);
+        r.put("tieneCv",     o.getCurriculum() != null);
+        return r;
     }
 
-    @GetMapping("/empresa/candidatos/cv")
-    public ResponseEntity<byte[]> verCvOferente(@RequestParam Integer oferenteId) {
-        Oferente oferente = service.findAll_Oferentes().stream()
-                .filter(o -> o.getId().equals(oferenteId)).findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Oferente no encontrado"));
-        if (oferente.getCurriculum() == null) return ResponseEntity.notFound().build();
+    // GET /api/empresa/candidatos/{oferenteId}/cv  → PDF binario
+    @GetMapping("/candidatos/{oferenteId}/cv")
+    public ResponseEntity<byte[]> cvOferente(@PathVariable Integer oferenteId) {
+        Oferente o = service.findAll_Oferentes().stream()
+                .filter(of -> of.getId().equals(oferenteId)).findFirst()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        if (o.getCurriculum() == null) return ResponseEntity.notFound().build();
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_PDF)
-                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"cv_" + oferente.getNombre() + ".pdf\"")
-                .body(oferente.getCurriculum());
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"cv_" + o.getNombre() + ".pdf\"")
+                .body(o.getCurriculum());
     }
 }
