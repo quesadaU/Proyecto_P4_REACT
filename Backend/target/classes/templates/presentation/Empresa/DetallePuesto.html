@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{presentation/fragmentPublic :: head}"></head>
+<body>
+
+<section class="Inicio">
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container">
+            <p class="mb-0 d-flex align-items-center">
+                <img src="https://cdn-icons-png.flaticon.com/512/86/86155.png" alt="icono"
+                     style="width:50px;height:50px;filter: brightness(0) invert(1);">
+                <strong class="ms-2 text-white"> Bolsa de Empleo</strong>
+            </p>
+            <div class="navbar-nav ms-auto align-items-center">
+                <a class="nav-link" th:href="@{/DashboardEmpresa}">Dashboard</a>
+                <a class="nav-link active" th:href="@{/empresa/puestos}">Mis puestos</a>
+                <a class="nav-link" th:href="@{/empresa/puestos/nuevo}">Publicar puesto</a>
+                <a class="nav-link" th:href="@{/logout}">Salir</a>
+            </div>
+        </div>
+    </nav>
+</section>
+
+<div class="container mt-5">
+    <h2 class="fw-bold">Habilidades del puesto</h2>
+    <p class="text-muted" th:text="${puesto.descripcion}"></p>
+
+    <div class="row">
+
+        <!-- Lista de habilidades actuales -->
+        <div class="col-md-7">
+            <h5>Características requeridas</h5>
+            <p th:if="${habilidades == null or #lists.isEmpty(habilidades)}" class="text-muted">
+                Aún no se han agregado características a este puesto.
+            </p>
+            <table class="table table-sm table-bordered"
+                   th:if="${habilidades != null and not #lists.isEmpty(habilidades)}">
+                <thead class="table-dark">
+                <tr>
+                    <th>Característica</th>
+                    <th>Nivel requerido</th>
+                    <th class="text-center">Acción</th>  <!-- ← NUEVO -->
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="h : ${habilidades}">
+                    <td th:text="${h.habilidad.nombre}"></td>
+                    <td th:text="${h.nivel}"></td>
+                    <td class="text-center">             <!-- ← NUEVO -->
+                        <form method="POST" th:action="@{/empresa/puestos/habilidad/eliminar}">
+                            <input type="hidden" name="habilidadId" th:value="${h.id}">
+                            <input type="hidden" name="puestoId"    th:value="${puesto.id}">
+                            <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Formulario para agregar nueva habilidad -->
+        <div class="col-md-5">
+            <div class="card p-4">
+                <h5 class="fw-bold">Agregar característica</h5>
+                <form method="POST" th:action="@{/empresa/puestos/habilidad}">
+                    <input type="hidden" name="puestoId" th:value="${puesto.id}">
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Característica</label>
+                        <select name="caracteristicaId" class="form-select" required>
+                            <option value="">-- Seleccioná --</option>
+                            <option th:each="c : ${caracteristicas}"
+                                    th:value="${c.id}"
+                                    th:text="${c.nombre}"></option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Nivel requerido (1–5)</label>
+                        <input type="number" name="nivel" class="form-control"
+                               min="1" max="5" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Agregar</button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    <a th:href="@{/empresa/puestos}" class="btn btn-secondary mt-3">Volver a mis puestos</a>
+</div>
+
+<footer th:replace="~{presentation/fragmentPublic :: footer}"></footer>
+</body>
+</html>

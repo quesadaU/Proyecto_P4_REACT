@@ -1,0 +1,96 @@
+/* Variables de color (ajustar según tu fragmento global) */
+:root {
+    --azul-oscuro: #1a237e;
+    --azul-acento: #3f51b5;
+    --azul-medio: #5c6bc0;
+    --dorado: #ffc107;
+}
+
+.main-content {
+    padding-top: 2rem;
+    padding-bottom: 3rem;
+}
+
+/* Estilos de la Tarjeta del Formulario */
+.card-formulario {
+    border-top: 4px solid var(--dorado);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.btn-primary-custom {
+    background-color: var(--azul-oscuro);
+    color: white;
+    padding: 8px;
+    font-size: 14px;
+    border: none;
+    transition: background 0.3s;
+}
+
+.btn-primary-custom:hover {
+    background-color: var(--azul-acento);
+    color: white;
+}
+
+/* Lista de características — árbol visual */
+.lista-caracteristicas {
+    list-style: none;
+    padding: 0;
+    margin-top: 1rem;
+}
+
+.item-padre {
+    background: #f8f9fb;
+    border-left: 3px solid var(--azul-acento);
+    border-radius: 4px;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.nombre-padre {
+    font-weight: bold;
+    color: var(--azul-oscuro);
+    font-size: 14px;
+}
+
+.lista-hijos {
+    list-style: none;
+    padding-left: 1.5rem;
+    margin-top: 8px;
+}
+
+.item-hijo {
+    font-size: 13px;
+    color: #444;
+    padding: 4px 0;
+}
+
+/* Prefijo visual para los hijos */
+.item-hijo::before {
+    content: "— ";
+    color: var(--azul-acento);
+    font-weight: bold;
+}
+
+/* Badges */
+.badge-tipo-padre {
+    background-color: var(--azul-acento);
+    color: white;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    text-transform: uppercase;
+}
+
+.ruta-navegacion {
+    font-size: 13px;
+    color: #666;
+}
+
+.badge-ruta {
+    background-color: var(--azul-medio);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+}

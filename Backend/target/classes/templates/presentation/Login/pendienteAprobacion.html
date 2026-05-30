@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{presentation/fragmentPublic :: head}"></head>
+<body>
+
+<section class="Inicio">
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container">
+            <p class="mb-0 d-flex align-items-center">
+                <img src="https://cdn-icons-png.flaticon.com/512/86/86155.png"
+                     alt="icono"
+                     style="width:50px;height:50px;filter: brightness(0) invert(1);">
+                <strong class="ms-2 text-white"> Bolsa de Empleo</strong>
+            </p>
+            <div class="navbar-nav ms-auto align-items-center">
+                <a class="nav-link" th:href="@{/static}">Inicio</a>
+                <a class="nav-link" th:href="@{/logout}">Cerrar sesión</a>
+            </div>
+        </div>
+    </nav>
+</section>
+
+<div class="container mt-5 text-center" style="max-width: 600px;">
+    <h2 class="fw-bold">Tu cuenta está pendiente de aprobación</h2>
+
+    <p class="text-muted mt-3">
+        Tu registro fue recibido correctamente. Un administrador debe revisar
+        y aprobar tu cuenta antes de que puedas acceder al sistema.
+    </p>
+
+    <!-- Muestra el tipo de cuenta que está esperando -->
+    <div class="alert alert-warning mt-4" th:if="${tipo == 'EMP'}">
+        <strong>Cuenta de empresa</strong> — en espera de aprobación administrativa.
+    </div>
+
+    <div class="alert alert-warning mt-4" th:if="${tipo == 'OFE'}">
+        <strong>Cuenta de oferente</strong> — en espera de aprobación administrativa.
+    </div>
+
+    <p class="text-muted small mt-3">
+        Si ya pasó tiempo y no has recibido respuesta, podés contactar al administrador del sistema.
+    </p>
+
+    <a th:href="@{/logout}" class="btn btn-secondary mt-3">Volver al inicio</a>
+</div>
+
+<footer th:replace="~{presentation/fragmentPublic :: footer}"></footer>
+</body>
+</html>

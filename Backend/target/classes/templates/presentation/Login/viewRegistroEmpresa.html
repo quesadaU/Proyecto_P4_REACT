@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{presentation/fragmentPublic :: head}"></head>
+
+<!--
+    ╔══════════════════════════════════════════════════════════════╗
+    ║  VISTA: Registro de Empresa                                  ║
+    ║  Ruta:  /login/empresa  (GET)                                ║
+    ║  POST:  /registro/empresa                                    ║
+    ║  CSS:   /css/registro-empresa.css                            ║
+    ╚══════════════════════════════════════════════════════════════╝
+    Esta vista permite a una nueva empresa completar su registro.
+    Al enviarse, se crea un Usuario (tipo EMP) y una Empresa asociada.
+    La empresa queda con aprobada=false hasta que el Admin la autorice.
+-->
+
+<head>
+    <!-- CSS específico de esta página (complementa style.css global) -->
+    <link rel="stylesheet" href="/css/registro_empresa.css">
+</head>
+
+<body>
+
+<section th:replace="~{presentation/fragmentPublic :: nav-var}"></section>
+
+
+<!-- ══════════════════════════════════════════════════════
+     SECCIÓN FORMULARIO
+     ══════════════════════════════════════════════════════ -->
+<section class="container seccion-registro">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-6">
+
+            <!-- TARJETA DEL FORMULARIO -->
+            <div class="card card-registro p-4">
+
+                <h5 class="mb-4 fw-bold text-center titulo-form">
+                    Completá los datos de tu empresa
+                </h5>
+
+                <!-- ─── MENSAJE DE ÉXITO ───────────────────────────────
+                     Se muestra cuando el registro fue exitoso.
+                     El controlador agrega th:registroExito=true al model.
+                ─────────────────────────────────────────────────────── -->
+                <div th:if="${registroExito}"
+                     class="alert alert-success text-center">
+                    Empresa registrada correctamente. Un administrador
+                    revisará tu solicitud pronto.
+                    <a th:href="@{/login}" class="alert-link">Volver al login</a>
+                </div>
+
+                <!-- ─── MENSAJE DE ERROR GENERAL ─────────────────────
+                     Se muestra si el controlador detecta un problema
+                     (ej: correo ya registrado, username duplicado).
+                ─────────────────────────────────────────────────────── -->
+                <div th:if="${error}"
+                     class="alert alert-danger"
+                     th:text="${error}">
+                </div>
+
+                <!-- ════════════════════════════════════════════════════
+                     FORMULARIO PRINCIPAL
+                     POST a /registro/empresa
+                     El controlador recibe:
+                       - username, clave  → crean el Usuario (tipo EMP)
+                       - nombre, localizacion, correo, telefono,
+                         descripcion     → crean la Empresa
+                ════════════════════════════════════════════════════ -->
+                <form method="POST" th:action="@{/registro/empresa}"
+                      th:unless="${registroExito}">
+
+                    <!-- ── BLOQUE: CREDENCIALES DE ACCESO ──────────── -->
+                    <div class="bloque-form">
+                        <h6 class="subtitulo-bloque">Credenciales de acceso</h6>
+
+                        <!-- Username (correo o alias que usará para entrar) -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                Nombre de usuario
+                                <span class="text-danger">*</span>
+                            </label>
+                            <input type="text"
+                                   name="username"
+                                   class="form-control"
+                                   placeholder="ej: mi_empresa"
+                                   required
+                                   minlength="4">
+                            <div class="form-text">
+                                Este será tu usuario para iniciar sesión.
+                            </div>
+                        </div>
+
+                        <!-- Contraseña -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                Contraseña
+                                <span class="text-danger">*</span>
+                            </label>
+                            <input type="password"
+                                   name="clave"
+                                   class="form-control"
+                                   placeholder="Mínimo 6 caracteres"
+                                   required
+                                   minlength="6">
+                        </div>
+                    </div>
+
+                    <!-- ── BLOQUE: DATOS DE LA EMPRESA ──────────────── -->
+                    <div class="bloque-form">
+                        <h6 class="subtitulo-bloque">Datos de la empresa</h6>
+
+                        <!-- Nombre de la empresa -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                Nombre de la empresa
+                                <span class="text-danger">*</span>
+                            </label>
+                            <input type="text"
+                                   name="nombre"
+                                   class="form-control"
+                                   placeholder="ej: TechCorp S.A."
+                                   required>
+                        </div>
+
+                        <!-- Localización -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                Localización
+                                <span class="text-danger">*</span>
+                            </label>
+                            <input type="text"
+                                   name="localizacion"
+                                   class="form-control"
+                                   placeholder="ej: San José, Costa Rica"
+                                   required>
+                        </div>
+
+                        <!-- Correo electrónico -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                Correo electrónico
+                                <span class="text-danger">*</span>
+                            </label>
+                            <input type="email"
+                                   name="correo"
+                                   class="form-control"
+                                   placeholder="empresa@correo.com"
+                                   required>
+                        </div>
+
+                        <!-- Teléfono -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                Teléfono
+                                <span class="text-danger">*</span>
+                            </label>
+                            <input type="tel"
+                                   name="telefono"
+                                   class="form-control"
+                                   placeholder="ej: 2222-3333"
+                                   required>
+                        </div>
+
+                        <!-- Descripción general de la empresa -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                Descripción
+                                <span class="text-danger">*</span>
+                            </label>
+                            <textarea name="descripcion"
+                                      class="form-control"
+                                      rows="3"
+                                      placeholder="Breve descripción de la empresa y sus actividades..."
+                                      required></textarea>
+                        </div>
+                    </div>
+
+                    <!-- ── BOTÓN ENVIAR ─────────────────────────────── -->
+                    <button type="submit"
+                            class="btn btn-registro w-100 mt-2">
+                        Registrar empresa
+                    </button>
+
+                    <!-- ── NOTA INFORMATIVA ────────────────────────── -->
+                    <p class="text-center text-muted small mt-3">
+                        Tu cuenta quedará pendiente de aprobación por un administrador.
+                        <br>Los campos con <span class="text-danger">*</span> son obligatorios.
+                    </p>
+
+                </form>
+
+                <!-- LINK ALTERNATIVO: si ya tiene cuenta o quiere registrarse como oferente -->
+                <hr>
+                <div class="text-center small" th:unless="${registroExito}">
+                    <a th:href="@{/login}">¿Ya tenés cuenta? Iniciá sesión</a>
+                    &nbsp;|&nbsp;
+                    <a th:href="@{/login/oferente}">Registrarse como oferente</a>
+                </div>
+
+            </div><!-- /card-registro -->
+        </div>
+    </div>
+</section>
+
+<!-- PIE DE PÁGINA (fragmento global) -->
+<footer th:replace="~{presentation/fragmentPublic :: footer}"></footer>
+
+</body>
+</html>

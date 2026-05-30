@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="147396b2-cefc-496f-bc26-216c74c91af6" name="Changes" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CopilotChats">
+    <option name="panelChat">
+      <chat>
+        <option name="activeSessionId" value="2925d76a-6051-4034-aeb9-9091413d6376" />
+        <option name="sessions">
+          <session>
+            <option name="chatType" value="PANEL" />
+            <option name="id" value="2925d76a-6051-4034-aeb9-9091413d6376" />
+            <option name="modeId" value="Agent" />
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="auto" />
+            <option name="status" value="Stopped" />
+            <option name="targetType" value="LOCAL" />
+          </session>
+          <session>
+            <option name="chatType" value="PANEL" />
+            <option name="id" value="1969d295-e55b-437a-b0f3-d32f2b1368c0" />
+            <option name="modeId" value="Agent" />
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="auto" />
+            <option name="targetType" value="LOCAL" />
+          </session>
+          <session>
+            <option name="chatType" value="PANEL" />
+            <option name="id" value="71e20bd4-1e76-467c-bf1b-770ab0b8ce6c" />
+            <option name="modeId" value="Agent" />
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="auto" />
+            <option name="targetType" value="LOCAL" />
+          </session>
+          <session>
+            <option name="chatType" value="PANEL" />
+            <option name="id" value="3c02773d-8999-4c7b-bed1-de73e46308fe" />
+            <option name="modeId" value="Agent" />
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="auto" />
+            <option name="targetType" value="LOCAL" />
+          </session>
+        </option>
+        <option name="type" value="PANEL" />
+      </chat>
+    </option>
+  </component>
+  <component name="CopilotPersistence">
+    <persistenceIdMap>
+      <entry key="_C:/Users/ALEXQUESADABERMUDEZ/Documents/GitHub/Proyecto_P4_REACT" value="3E0ABef6r0mkJwnwvnEAycj69IR" />
+      <entry key="_C:/Users/ALEXQUESADABERMUDEZ/Documents/GitHub/Proyecto_P4_REACT/Backend" value="3EKIB3u0y6P9k5TQ9lKoyq2NZCY" />
+    </persistenceIdMap>
+  </component>
+  <component name="CopilotUserSelectedModel">
+    <selectedModels>
+      <entry key="agent-panel" value="Auto" />
+      <entry key="chat-panel" value="Auto" />
+    </selectedModels>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="AnnotationType" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="Alex2" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;Alexq70&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/DavidSalazar052/Proyecto_P4_REACT.git&quot;,
+    &quot;accountId&quot;: &quot;cde571a5-68c8-4c65-9d4c-0dd84139e560&quot;
+  }
+}</component>
+  <component name="KubernetesApiPersistence"><![CDATA[{}]]></component>
+  <component name="KubernetesApiProvider"><![CDATA[{
+  "isMigrated": true
+}]]></component>
+  <component name="MavenRunner">
+    <option name="jreName" value="21" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 2
+}</component>
+  <component name="ProjectId" id="3E0ABef6r0mkJwnwvnEAycj69IR" />
+  <component name="ProjectSessionTemplates">
+    <option name="panelTemplate">
+      <template>
+        <option name="modeId" value="Agent" />
+        <option name="model">
+          <model>
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="auto" />
+          </model>
+        </option>
+        <option name="targetType" value="LOCAL" />
+      </template>
+    </option>
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Maven.Proyecto_P4_BolsaEmpleo [clean].executor": "Run",
+    "Maven.Proyecto_P4_BolsaEmpleo [install].executor": "Run",
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Spring Boot.Application.executor": "Run",
+    "Spring Boot.ProyectoP4BolsaEmpleoApplication.executor": "Run",
+    "git-widget-placeholder": "Alex-definitivo",
+    "ignore.virus.scanning.warn.message": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/ALEXQUESADABERMUDEZ/Documents/GitHub/Proyecto_P4_REACT",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "npm.FrontEnd.executor": "Run",
+    "npm.FronteEnd.executor": "Run",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
+    "settings.editor.selected.configurable": "database.query.execution",
+    "ts.external.directory.path": "C:\\Users\\ALEXQUESADABERMUDEZ\\AppData\\Roaming\\JetBrains\\IntelliJIdea2025.2\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external",
+    "vue.rearranger.settings.migration": "true"
+  },
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "mysql"
+    ]
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CreateClassDialog.RecentsKey">
+      <recent name="com.example.backend" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\ALEXQUESADABERMUDEZ\Documents\GitHub\Proyecto_P4_REACT\Backend\src\main\java\BolsaEmpleo\presentation" />
+      <recent name="C:\Users\ALEXQUESADABERMUDEZ\Documents\GitHub\Proyecto_P4_REACT\frontend\src" />
+      <recent name="C:\Users\ALEXQUESADABERMUDEZ\Documents\GitHub\Proyecto_P4_REACT\frontend\src\pages\admin" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\ALEXQUESADABERMUDEZ\Documents\GitHub\Proyecto_P4_REACT\frontend" />
+      <recent name="C:\Users\ALEXQUESADABERMUDEZ\Documents\GitHub\Proyecto_P4_REACT\frontend\src" />
+      <recent name="C:\Users\ALEXQUESADABERMUDEZ\Documents\GitHub\Proyecto_P4_REACT\frontend\src\pages\empresa" />
+      <recent name="C:\Users\ALEXQUESADABERMUDEZ\Documents\GitHub\Proyecto_P4_REACT\Backend\src\main\java" />
+      <recent name="C:\Users\ALEXQUESADABERMUDEZ\Documents\GitHub\Proyecto_P4_REACT\Backend\src\main\java\BolsaEmpleo" />
+    </key>
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="" />
+    </key>
+  </component>
+  <component name="RunManager" selected="npm.FrontEnd">
+    <configuration name="ProyectoP4BolsaEmpleoApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
+      <module name="Proyecto_P4_BolsaEmpleo" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="BolsaEmpleo.ProyectoP4BolsaEmpleoApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="FrontEnd" type="js.build_tools.npm">
+      <package-json value="$PROJECT_DIR$/frontend/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="dev" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="npm.FrontEnd" />
+      <item itemvalue="Spring Boot.ProyectoP4BolsaEmpleoApplication" />
+    </list>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.23892.409" />
+        <option value="bundled-js-predefined-d6986cc7102b-e03c56caf84a-JavaScript-IU-252.23892.409" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="147396b2-cefc-496f-bc26-216c74c91af6" name="Changes" comment="" />
+      <created>1779304979857</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1779304979857</updated>
+      <workItem from="1779647969203" duration="3546000" />
+      <workItem from="1779653197038" duration="15329000" />
+      <workItem from="1779835526514" duration="3726000" />
+      <workItem from="1779845218498" duration="727000" />
+      <workItem from="1779846099220" duration="2302000" />
+      <workItem from="1779848457930" duration="944000" />
+      <workItem from="1779849416684" duration="75000" />
+      <workItem from="1779849507186" duration="112000" />
+      <workItem from="1779849624153" duration="4000" />
+      <workItem from="1779849653189" duration="63000" />
+      <workItem from="1779849784635" duration="111000" />
+      <workItem from="1779907660936" duration="1113000" />
+      <workItem from="1779908807950" duration="1861000" />
+      <workItem from="1779910709779" duration="152000" />
+      <workItem from="1779910898548" duration="138000" />
+      <workItem from="1779911090503" duration="92000" />
+      <workItem from="1779911215897" duration="46000" />
+      <workItem from="1779911289786" duration="78000" />
+      <workItem from="1779911391231" duration="762000" />
+      <workItem from="1779912204249" duration="121000" />
+      <workItem from="1779912342337" duration="2393000" />
+      <workItem from="1779914832514" duration="2472000" />
+      <workItem from="1779918375615" duration="1630000" />
+      <workItem from="1779920029511" duration="646000" />
+      <workItem from="1779920699841" duration="6524000" />
+      <workItem from="1779936794622" duration="268000" />
+      <workItem from="1779937079346" duration="3167000" />
+      <workItem from="1780082234997" duration="4052000" />
+      <workItem from="1780095700803" duration="891000" />
+      <workItem from="1780098142984" duration="3880000" />
+      <workItem from="1780102278705" duration="5873000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
+  </component>
+  <component name="github-copilot-workspace">
+    <instructionFileLocations>
+      <option value=".github/instructions" />
+    </instructionFileLocations>
+    <promptFileLocations>
+      <option value=".github/prompts" />
+    </promptFileLocations>
+  </component>
+</project>

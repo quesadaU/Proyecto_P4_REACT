@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<!--
+    ╔══════════════════════════════════════════════════════════════╗
+    ║  VISTA: Registro de Oferente                                 ║
+    ║  Ruta:  /login/oferente  (GET)                               ║
+    ║  POST:  /registro/oferente                                   ║
+    ║  CSS:   /css/registro_oferente.css                           ║
+    ╚══════════════════════════════════════════════════════════════╝
+    Esta vista permite a un nuevo oferente completar su registro.
+    Al enviarse, se crea un Usuario (tipo OFE) y un Oferente asociado.
+    El oferente queda con aprobado=false hasta que el Admin lo autorice.
+-->
+
+<head th:replace="~{presentation/fragmentPublic :: head}"></head>
+
+<head>
+    <link rel="stylesheet" href="/css/registro_oferente.css">
+</head>
+
+<body>
+
+<section th:replace="~{presentation/fragmentPublic :: nav-var}"></section>
+
+<!-- ══════════════════════════════════════════════════════
+     SECCIÓN FORMULARIO
+     ══════════════════════════════════════════════════════ -->
+<section class="container seccion-registro">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-7">
+
+            <!-- TARJETA DEL FORMULARIO -->
+            <div class="card card-registro p-4">
+
+                <h5 class="mb-4 fw-bold text-center titulo-form">
+                    Completá tus datos personales
+                </h5>
+
+                <!-- ─── MENSAJE DE ÉXITO ─────────────────────────────── -->
+                <div th:if="${registroExito}"
+                     class="alert alert-success text-center">
+                     Registro exitoso. Tu cuenta quedará pendiente de aprobación.
+                    <a th:href="@{/login}" class="alert-link">Volver al login</a>
+                </div>
+
+                <!-- ─── MENSAJE DE ERROR ─────────────────────────────── -->
+                <div th:if="${error}"
+                     class="alert alert-danger"
+                     th:text="${error}">
+                </div>
+
+                <!-- ════════════════════════════════════════════════════
+                     FORMULARIO PRINCIPAL
+                     POST a /registro/oferente
+                     El controlador recibe:
+                       - username, clave       → crean el Usuario (tipo OFE)
+                       - nombre, apellido,
+                         nacionalidad, telefono,
+                         correo, residencia    → crean el Oferente
+                ════════════════════════════════════════════════════ -->
+                <form method="POST" th:action="@{/registro/oferente}"
+                      th:unless="${registroExito}">
+
+                    <!-- ── BLOQUE: CREDENCIALES DE ACCESO ──────────── -->
+                    <div class="bloque-form">
+                        <h6 class="subtitulo-bloque">Credenciales de acceso</h6>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                Nombre de usuario
+                                <span class="text-danger">*</span>
+                            </label>
+                            <input type="text"
+                                   name="username"
+                                   class="form-control"
+                                   placeholder="ej: juan_perez"
+                                   required
+                                   minlength="4">
+                            <div class="form-text">
+                                Este será tu usuario para iniciar sesión.
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                Contraseña
+                                <span class="text-danger">*</span>
+                            </label>
+                            <input type="password"
+                                   name="clave"
+                                   class="form-control"
+                                   placeholder="Mínimo 6 caracteres"
+                                   required
+                                   minlength="6">
+                        </div>
+                    </div>
+
+                    <!-- ── BLOQUE: DATOS PERSONALES ─────────────────── -->
+                    <div class="bloque-form">
+                        <h6 class="subtitulo-bloque">Datos personales</h6>
+
+                        <!-- Nombre y Apellido en la misma fila -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">
+                                    Nombre
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input type="text"
+                                       name="nombre"
+                                       class="form-control"
+                                       placeholder="ej: Juan"
+                                       required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">
+                                    Apellido
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input type="text"
+                                       name="apellido"
+                                       class="form-control"
+                                       placeholder="ej: Pérez"
+                                       required>
+                            </div>
+                        </div>
+
+                        <!-- Nacionalidad -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                Nacionalidad
+                                <span class="text-danger">*</span>
+                            </label>
+                            <input type="text"
+                                   name="nacionalidad"
+                                   class="form-control"
+                                   placeholder="ej: Costarricense"
+                                   required>
+                        </div>
+
+                        <!-- Teléfono y Correo en la misma fila -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">
+                                    Teléfono
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input type="tel"
+                                       name="telefono"
+                                       class="form-control"
+                                       placeholder="ej: 8888-1234"
+                                       required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">
+                                    Correo electrónico
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input type="email"
+                                       name="correo"
+                                       class="form-control"
+                                       placeholder="juan@correo.com"
+                                       required>
+                            </div>
+                        </div>
+
+                        <!-- Residencia -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                Residencia
+                                <span class="text-danger">*</span>
+                            </label>
+                            <input type="text"
+                                   name="residencia"
+                                   class="form-control"
+                                   placeholder="ej: Heredia, Costa Rica"
+                                   required>
+                        </div>
+                    </div>
+
+                    <!-- ── BOTÓN ENVIAR ─────────────────────────────── -->
+                    <button type="submit"
+                            class="btn btn-registro w-100 mt-2">
+                        Registrarme como oferente
+                    </button>
+
+                    <!-- ── NOTA INFORMATIVA ────────────────────────── -->
+                    <p class="text-center text-muted small mt-3">
+                        Tu cuenta quedará pendiente de aprobación por un administrador.
+                        <br>Los campos con <span class="text-danger">*</span> son obligatorios.
+                    </p>
+
+                </form>
+
+                <!-- LINKS ALTERNATIVAS -->
+                <hr>
+                <div class="text-center small" th:unless="${registroExito}">
+                    <a th:href="@{/login}">¿Ya tenés cuenta? Iniciá sesión</a>
+                    &nbsp;|&nbsp;
+                    <a th:href="@{/login/empresa}">Registrarse como empresa</a>
+                </div>
+
+            </div><!-- /card-registro -->
+        </div>
+    </div>
+</section>
+
+<!-- PIE DE PÁGINA -->
+<footer th:replace="~{presentation/fragmentPublic :: footer}"></footer>
+
+</body>
+</html>
