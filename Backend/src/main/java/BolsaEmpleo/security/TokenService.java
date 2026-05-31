@@ -40,6 +40,7 @@ public class TokenService {
         Instant now = Instant.now();
         var claims = new JWTClaimsSet.Builder()
                 .issuer("BolsaEmpleo")
+                .subject(usuario.getUsername())
                 .issueTime(Date.from(now))
                 .expirationTime(Date.from(now.plus(jwtConfig.getJwtExpiration(), ChronoUnit.MILLIS)))
                 // scope: requerido por Spring Security para hasAuthority("SCOPE_ADM") etc.
