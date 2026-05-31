@@ -1,6 +1,7 @@
 import { useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { AppContext, apiFetch } from '../../AppProvider.jsx';
+import Footer from '../../components/Footer.jsx';
 
 export default function DashboardEmpresa() {
     const { authState, setAuthState, empresaState, setEmpresaState } = useContext(AppContext);
@@ -8,15 +9,12 @@ export default function DashboardEmpresa() {
 
     useEffect(() => {
         apiFetch('/api/empresa/perfil')
-            .then(r => {
-                if (r.status === 403) navigate('/pendiente');
-                return r.json();
-            })
+            .then(r => { if (r.status === 403) navigate('/pendiente'); return r.json(); })
             .then(data => setEmpresaState(prev => ({ ...prev, perfil: data })))
             .catch(() => {});
     }, []);
 
-    const logout = async () => {
+    const cerrarSesion = async () => {
         await apiFetch('/api/auth/logout', { method: 'POST' });
         setAuthState({ usuario: null, cargando: false, error: null });
         navigate('/login');
@@ -25,49 +23,67 @@ export default function DashboardEmpresa() {
     const { perfil } = empresaState;
 
     return (
-        <div style={styles.page}>
-            <header style={styles.header}>
-                <div>
-                    <h1 style={styles.title}>Panel Empresa</h1>
-                    <p style={styles.sub}>{perfil?.nombre ?? authState.usuario?.username}</p>
+        <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+            <section className="Inicio">
+                <nav className="navbar-custom">
+                    <div className="navbar-inner">
+                        <a href="/" className="navbar-brand">
+                            <img src="https://cdn-icons-png.flaticon.com/512/86/86155.png" alt="icono"
+                                style={{ width: 36, height: 36, filter: 'brightness(0) invert(1)' }} />
+                            <strong>Bolsa de Empleo</strong>
+                        </a>
+                        <div className="navbar-links">
+                            <Link className="nav-link" to="/empresa">Dashboard</Link>
+                            <Link className="nav-link" to="/empresa/puestos">Mis Puestos</Link>
+                            <Link className="nav-link" to="/empresa/puestos/nuevo">Nuevo Puesto</Link>
+                            <Link className="nav-link" to="/empresa/editar">Mi Perfil</Link>
+                            {authState.usuario && (
+                                <span className="nav-link" style={{ color: 'var(--dorado)', fontWeight: 'bold' }}>
+                                    {authState.usuario.username}
+                                </span>
+                            )}
+                            <button className="nav-link-login" onClick={cerrarSesion}>Salir</button>
+                        </div>
+                    </div>
+                </nav>
+                <div className="hero-content" style={{ padding: '30px 20px 40px' }}>
+                    <p className="hero-eyebrow">Panel de Empresa</p>
+                    <h1 className="hero-title" style={{ fontSize: 32 }}>
+                        {perfil?.nombre ?? authState.usuario?.username}
+                    </h1>
                 </div>
-                <button style={styles.logoutBtn} onClick={logout}>Cerrar sesión</button>
-            </header>
+            </section>
 
-            {perfil && (
-                <div style={styles.perfilCard}>
-                    <p>📍 {perfil.localizacion}</p>
-                    <p>📧 {perfil.correo}</p>
-                    <p>📞 {perfil.telefono}</p>
-                    {perfil.descripcion && <p>📄 {perfil.descripcion}</p>}
+            <div className="contenedor-puestos" style={{ flex: 1 }}>
+                <div style={{ maxWidth: 1000, margin: '0 auto' }}>
+                    {perfil && (
+                        <div className="card" style={{ marginBottom: '2rem', display: 'flex', flexWrap: 'wrap', gap: 16 }}>
+                            <span>📍 {perfil.localizacion}</span>
+                            <span>📧 {perfil.correo}</span>
+                            <span>📞 {perfil.telefono}</span>
+                            {perfil.descripcion && <span>📄 {perfil.descripcion}</span>}
+                        </div>
+                    )}
+
+                    <h2 className="titulo-seccion">Acciones</h2>
+                    <div className="grid-puestos" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))' }}>
+                        {[
+                            { to: '/empresa/puestos',       icon: '💼', label: 'Mis Puestos' },
+                            { to: '/empresa/puestos/nuevo', icon: '➕', label: 'Nuevo Puesto' },
+                            { to: '/empresa/editar',        icon: '✏️', label: 'Editar Perfil' },
+                        ].map(m => (
+                            <Link key={m.to} to={m.to} style={{ textDecoration: 'none' }}>
+                                <div className="card-puesto" style={{ textAlign: 'center', padding: '2rem 1rem', cursor: 'pointer' }}>
+                                    <div style={{ fontSize: 36, marginBottom: 10 }}>{m.icon}</div>
+                                    <p style={{ fontWeight: 700, color: 'var(--azul-oscuro)', margin: 0 }}>{m.label}</p>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
                 </div>
-            )}
-
-            <div style={styles.grid}>
-                {[
-                    { to: '/empresa/puestos', icon: '💼', label: 'Mis puestos' },
-                    { to: '/empresa/puestos/nuevo', icon: '➕', label: 'Nuevo puesto' },
-                    { to: '/empresa/editar', icon: '✏️', label: 'Editar perfil' },
-                ].map(m => (
-                    <Link key={m.to} to={m.to} style={styles.card}>
-                        <span style={styles.cardIcon}>{m.icon}</span>
-                        <span style={styles.cardLabel}>{m.label}</span>
-                    </Link>
-                ))}
             </div>
+
+            <Footer />
         </div>
     );
 }
-
-const styles = {
-    page: { minHeight: '100vh', background: '#f1f5f9', fontFamily: 'sans-serif' },
-    header: { background: 'linear-gradient(135deg,#0f766e,#0d9488)', color: '#fff', padding: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
-    title: { margin: 0, fontSize: '1.8rem', fontWeight: 800 },
-    sub: { margin: '0.25rem 0 0', opacity: 0.85 },
-    logoutBtn: { background: 'rgba(255,255,255,0.18)', color: '#fff', border: '1px solid rgba(255,255,255,0.4)', borderRadius: 8, padding: '0.5rem 1.2rem', cursor: 'pointer', fontWeight: 600 },
-    perfilCard: { background: '#fff', borderRadius: 12, padding: '1.25rem 2rem', margin: '1.5rem 2rem 0', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', color: '#475569', display: 'flex', flexWrap: 'wrap', gap: 16 },
-    grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(200px,1fr))', gap: 20, padding: '2rem', maxWidth: 800, margin: '0 auto' },
-    card: { background: '#fff', borderRadius: 14, padding: '2rem 1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, textDecoration: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.07)' },
-    cardIcon: { fontSize: 36 },
-    cardLabel: { fontWeight: 700, color: '#0f766e', textAlign: 'center' },
-};

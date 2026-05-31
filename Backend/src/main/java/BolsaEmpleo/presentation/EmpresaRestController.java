@@ -47,7 +47,11 @@ public class EmpresaRestController {
 
     // Helper: obtiene la Empresa del usuario autenticado
     private Empresa getEmpresa(Principal principal) {
+        if (principal == null)
+            throw new RuntimeException("No autenticado");
         Usuario u = usuarioRepo.findByUsernameOnly(principal.getName());
+        if (u == null)
+            throw new RuntimeException("Usuario no encontrado: " + principal.getName());
         return service.empresaByUsuario(u.getId());
     }
 

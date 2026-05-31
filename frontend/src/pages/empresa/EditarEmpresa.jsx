@@ -1,9 +1,11 @@
 import { useEffect, useContext, useState } from 'react';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import { AppContext, apiFetch } from '../../AppProvider.jsx';
+import Footer from '../../components/Footer.jsx';
 
 export default function EditarEmpresa() {
     const { empresaState, setEmpresaState } = useContext(AppContext);
+    const navigate = useNavigate();
     const [form, setForm] = useState({ nombre: '', localizacion: '', correo: '', telefono: '', descripcion: '' });
     const [mensaje, setMensaje] = useState(null);
     const [error, setError] = useState(null);
@@ -21,8 +23,7 @@ export default function EditarEmpresa() {
     const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
 
     const handleSubmit = async e => {
-        e.preventDefault();
-        setError(null);
+        e.preventDefault(); setError(null);
         const res = await apiFetch('/api/empresa/perfil', { method: 'PUT', body: JSON.stringify(form) });
         const data = await res.json();
         if (!res.ok) { setError(data.error); return; }
@@ -30,54 +31,72 @@ export default function EditarEmpresa() {
         setTimeout(() => setMensaje(null), 3000);
     };
 
-    const campos = [
-        { name: 'nombre', label: 'Nombre', placeholder: 'Nombre de la empresa' },
-        { name: 'localizacion', label: 'Localización', placeholder: 'Ej: San José' },
-        { name: 'correo', label: 'Correo', placeholder: 'info@empresa.com' },
-        { name: 'telefono', label: 'Teléfono', placeholder: '88001122' },
-    ];
+    async function cerrarSesion() {
+        await apiFetch('/api/auth/logout', { method: 'POST' });
+        navigate('/login');
+    }
 
     return (
-        <div style={styles.page}>
-            <header style={styles.header}>
-                <Link to="/empresa" style={styles.back}>← Dashboard</Link>
-                <h2 style={styles.title}>Editar Perfil de Empresa</h2>
-            </header>
-            <div style={styles.body}>
-                <div style={styles.card}>
-                    {error && <div style={styles.error}>{error}</div>}
-                    {mensaje && <div style={styles.exito}>{mensaje}</div>}
-                    <form onSubmit={handleSubmit} style={styles.form}>
-                        {campos.map(f => (
-                            <div key={f.name} style={styles.field}>
-                                <label style={styles.label}>{f.label}</label>
-                                <input style={styles.input} name={f.name} value={form[f.name]} onChange={handleChange} placeholder={f.placeholder} />
-                            </div>
-                        ))}
-                        <div style={styles.field}>
-                            <label style={styles.label}>Descripción</label>
-                            <textarea style={{ ...styles.input, minHeight: 80, resize: 'vertical' }} name="descripcion" value={form.descripcion} onChange={handleChange} />
+        <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+            <section className="Inicio inicio-compact">
+                <nav className="navbar-custom">
+                    <div className="navbar-inner">
+                        <a href="/" className="navbar-brand">
+                            <img src="https://cdn-icons-png.flaticon.com/512/86/86155.png" alt="icono"
+                                style={{ width: 36, height: 36, filter: 'brightness(0) invert(1)' }} />
+                            <strong>Bolsa de Empleo</strong>
+                        </a>
+                        <div className="navbar-links">
+                            <Link className="nav-link" to="/empresa">Dashboard</Link>
+                            <Link className="nav-link" to="/empresa/puestos">Mis Puestos</Link>
+                            <Link className="nav-link" to="/empresa/editar">Mi Perfil</Link>
+                            <button className="nav-link-login" onClick={cerrarSesion}>Salir</button>
                         </div>
-                        <button style={styles.btn} type="submit">Guardar cambios</button>
-                    </form>
+                    </div>
+                </nav>
+            </section>
+
+            <div className="seccion-registro">
+                <div className="registro-card-wrapper">
+                    <div className="card card-registro">
+                        <h2 className="titulo-form">Editar Perfil de Empresa</h2>
+                        {error   && <div className="alert-danger-box">{error}</div>}
+                        {mensaje && <div className="alert-success-box">{mensaje}</div>}
+                        <form onSubmit={handleSubmit}>
+                            <div className="bloque-form">
+                                <p className="subtitulo-bloque">Datos de la empresa</p>
+                                <div className="form-row-2">
+                                    <div className="form-group">
+                                        <label className="form-label">Nombre</label>
+                                        <input className="form-input" name="nombre" value={form.nombre} onChange={handleChange} placeholder="Nombre de la empresa" />
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="form-label">Localización</label>
+                                        <input className="form-input" name="localizacion" value={form.localizacion} onChange={handleChange} placeholder="Ej: San José" />
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="form-label">Correo</label>
+                                        <input className="form-input" name="correo" value={form.correo} onChange={handleChange} placeholder="info@empresa.com" />
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="form-label">Teléfono</label>
+                                        <input className="form-input" name="telefono" value={form.telefono} onChange={handleChange} placeholder="88001122" />
+                                    </div>
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label">Descripción</label>
+                                    <textarea className="form-input" name="descripcion" value={form.descripcion} onChange={handleChange} />
+                                </div>
+                            </div>
+                            <button className="btn-primary w-100" type="submit">Guardar Cambios</button>
+                        </form>
+                        <hr />
+                        <p className="text-center small"><Link to="/empresa">← Volver al Dashboard</Link></p>
+                    </div>
                 </div>
             </div>
+
+            <Footer />
         </div>
     );
 }
-
-const styles = {
-    page: { minHeight: '100vh', background: '#f1f5f9', fontFamily: 'sans-serif' },
-    header: { background: '#0f766e', color: '#fff', padding: '1.5rem 2rem' },
-    back: { color: 'rgba(255,255,255,0.75)', textDecoration: 'none', fontSize: 14, display: 'block', marginBottom: 6 },
-    title: { margin: 0, fontSize: '1.4rem', fontWeight: 800 },
-    body: { padding: '2rem' },
-    card: { background: '#fff', borderRadius: 12, padding: '2rem', maxWidth: 480, boxShadow: '0 2px 12px rgba(0,0,0,0.07)' },
-    error: { background: '#fee2e2', color: '#dc2626', borderRadius: 8, padding: '0.5rem 1rem', marginBottom: 12, fontSize: 14 },
-    exito: { background: '#dcfce7', color: '#16a34a', borderRadius: 8, padding: '0.5rem 1rem', marginBottom: 12, fontSize: 14 },
-    form: { display: 'flex', flexDirection: 'column', gap: 12 },
-    field: { display: 'flex', flexDirection: 'column', gap: 4 },
-    label: { fontSize: 13, fontWeight: 600, color: '#374151' },
-    input: { padding: '0.55rem 0.8rem', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: 14 },
-    btn: { marginTop: 8, padding: '0.7rem', borderRadius: 8, background: '#0f766e', color: '#fff', fontWeight: 700, border: 'none', cursor: 'pointer' },
-};
